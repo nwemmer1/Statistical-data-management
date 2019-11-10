@@ -1,0 +1,222 @@
+---
+title: "Nathan Wemmer"
+output: html_notebook
+---
+
+# Chapter 11 - Assignment 9
+
+# Section 11.1 
+# Section 11.1.2
+# Section 11.1.3
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+results <- read.table("yields.txt",header=T)
+attach(results)
+names(results)
+results
+sapply(list(sand,clay,loam),mean)
+
+(frame <- stack(results))
+
+names(frame) <- c("yield","soil")
+attach(frame)
+head(frame)
+
+tapply(yield,soil,var)
+
+#fligner.test(y~soil)
+fligner.test(yield~soil)
+
+
+plot(yield~soil,col="green")
+sum((yield-mean(yield))^2)
+
+sand-mean(sand)
+clay-mean(clay)
+loam-mean(loam)
+
+sum((sand-mean(sand))^2)
+sum((clay-mean(clay))^2)
+sum((loam-mean(loam))^2)
+sum(sapply(list(sand,clay,loam),function (x) sum((x-mean(x))^2) ))
+tapply(yield,soil,var)
+mean(tapply(yield,soil,var))
+qf(.95,2,27)
+1-pf(4.24,2,27)
+
+summary(aov(yield~soil))
+
+par(mfrow=c(2,2))
+plot(aov(yield~soil))
+
+```
+
+# Section 11.1.4
+```{r}
+model <- aov(yield~soil)
+model.tables(model,se=T)
+model.tables(model,"means",se=T)
+summary.lm(model)
+qt(0.975,18)
+2*(1 - pt(2.88, df = 18))
+```
+
+# Section 11.1.5
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+comp <- read.table("competition.txt",header=T)
+
+
+attach(comp)
+names(comp)
+
+plot(clipping,biomass,xlab="Competition treatment",
+     ylab="Biomass",col="yellow")
+
+error.bars <- function(yv,z,nn)
+{xv <- barplot(yv,ylim=c(0,(max(yv)+max(z))),
+               col="green",names=nn,ylab=deparse(substitute(yv)))
+for (i in 1:length(xv)) {
+  arrows(xv[i],yv[i]+z[i],xv[i],yv[i]-z[i],angle=90,code=3,length=0.15)
+}}
+
+model <- aov(biomass~clipping)
+summary(model)
+table(clipping)
+se <- rep(28.75,5)
+
+labels <- levels(clipping)
+ybar <- tapply(biomass,clipping,mean)
+error.bars(ybar,se,labels)
+error.bars(ybar,2.570582*se,labels)
+qt(0.975,10)*sqrt(2*4961/6)
+
+lsd <- qt(0.975,10)*sqrt(2*4961/6)
+lsdbars <- rep(lsd,5)/2
+error.bars(ybar,lsdbars,labels)
+```
+# Section 11.2
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+weights <- read.table("growth.txt",header=T)
+attach(weights)
+
+labs <- c("Barley","Oats","Wheat")
+legend(locator(1),labs,fill= c("orange","yellow","cornsilk"))
+
+tapply(gain,list(diet,supplement),mean)
+
+model <- aov(gain~diet*supplement)
+summary(model)
+
+summary.lm(model)
+
+model <- aov(gain~diet+supplement)
+summary.lm(model)
+
+supp2 <- factor(supplement)
+levels(supp2)
+
+levels(supp2)[c(1,4)] <- "best"
+levels(supp2)[c(2,3)] <- "worst"
+levels(supp2)
+
+model2 <- aov(gain~diet+supp2)
+anova(model,model2)
+
+summary.lm(model2)
+```
+# Section 11.3
+```{r}
+yields <- read.table("splityield.txt",header=T)
+
+
+attach(yields)
+names(yields)
+
+model <-
+  aov(yield~irrigation*density*fertilizer+Error(block/irrigation/density))
+summary(model)
+interaction.plot(fertilizer,irrigation,yield)
+interaction.plot(density,irrigation,yield)
+```
+
+# Section 11.4
+```{r}
+rats <- read.table("rats.txt",header=T)
+
+
+attach(rats)
+names(rats)
+
+Treatment <- factor(Treatment)
+Rat <- factor(Rat)
+Liver <- factor(Liver)
+
+model <- aov(Glycogen~Treatment)
+summary(model)
+
+(means <- tapply(Glycogen,list(Treatment,Rat),mean))
+
+treat <- gl(3,1,length=6)
+model <- aov(as.vector(means)~treat)
+summary(model)
+model2 <- aov(Glycogen~Treatment+Error(Treatment/Rat/Liver))
+summary(model2)
+varcomps <- c(21.17,14.165,36.065)
+100*varcomps/sum(varcomps)
+```
+# Section 11.5
+```{r}
+daphnia <- read.table("Daphnia.txt",header=T)
+
+
+attach(daphnia)
+names(daphnia)
+model1 <- aov(Growth.rate~Water*Detergent*Daphnia)
+summary(model1)
+
+model2 <- lm(Growth.rate~Water*Detergent*Daphnia)
+summary(model2)
+summary.lm(model1)
+summary.aov(model2)
+plot.design(Growth.rate~Water*Detergent*Daphnia)
+
+model.tables(model1, "means", se = TRUE)
+
+```
+# Section 11.6
+```{r}
+data <- read.table("Fungi.txt",header=T)
+
+
+attach(data)
+names(data)
+
+
+model <- aov(Fugus.yield~Habitat)
+summary(model)
+
+
+TukeyHSD(model)
+plot(TukeyHSD(model))
+pairwise.t.test(Fugus.yield,Habitat)
+pairwise.t.test(Fugus.yield,Habitat,p.adjust.method="none")
+
+install.packages("multcomp")
+```
+# Section 11.7
+```{r}
+data <- read.table("manova.txt",header=T)
+
+
+attach(data)
+names(data)
+Y <- cbind(tear, gloss, opacity)
+
+model <- manova(Y~rate*additive)
+summary(model)
+summary.aov(model)
+
+```
+

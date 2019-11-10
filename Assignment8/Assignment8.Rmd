@@ -1,0 +1,481 @@
+---
+title: "Nathan Wemmer"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+# Assignment 8: Sections 10.1-10.13
+# Section 10.1
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+reg.data <- read.table("regression.txt",header=T)
+attach(reg.data)
+names(reg.data)
+plot(tannin,growth,pch=21,col="blue",bg="red")
+
+model <- lm(growth~tannin)
+abline(model,col="red")
+yhat <- predict(model,tannin=tannin)
+join <- function(i)
+  lines(c(tannin[i],tannin[i]),c(growth[i],yhat[i]),col="green")
+sapply(1:9,join)
+
+bs <- seq(-2,-0.5,0.01)
+SSE <- function(i) sum((growth - 12 - bs[i]*tannin)^2)
+plot(bs,sapply(1:length(bs),SSE),type="l",ylim=c(0,140),
+     xlab="slope b",ylab="sum of squared residuals",col="blue")
+
+```
+# Section 10.1.1
+```{r}
+sum(tannin);sum(tannin^2);sum(growth);sum(growth^2);sum(tannin*growth)
+XY <- cbind(1,growth,tannin)
+t(XY) %*% XY
+
+```
+
+# Section 10.1.2
+```{r}
+mean(growth)+1.216667*mean(tannin)
+lm(growth~tannin)
+```
+# Section 10.1.3
+```{r}
+x=1:20
+y <- 5+0.5*x
+plot(x,y,pch=16,xlim=c(0,20),ylim=c(0,15),col="red",main="r squared = 1")
+abline(5,0.5,col="blue")
+x=1:20
+#y <- 5+runif(30)*10
+y <- 5+runif(20)*10
+plot(x,y,pch=16,xlim=c(0,20),ylim=c(0,15),col="red",main="r squared = 0")
+abline(h=10,col="blue")
+
+deviance(lm(growth~1))
+deviance(lm(growth~tannin))
+summary(lm(growth~tannin))[[8]]
+```
+# Section 10.1.4
+```{r}
+(sse <- deviance(lm(growth~tannin)))
+(ssy <- deviance(lm(growth~1)))
+
+(ssr <- ssy-sse)
+anova(lm(growth~tannin))
+
+qf(0.95,1,7)
+1-pf(30.974,1,7)
+
+```
+
+# Section 10.1.5
+```{r}
+summary(lm(growth~tannin))
+confint(model)
+
+```
+
+# Section 10.1.6
+```{r}
+model <- lm(growth~tannin)
+predict(model,list(tannin=5.5))
+predict(model,list(tannin=c(3.3,4.4,5.5,6.6)))
+```
+
+# Section 10.1.7
+```{r}
+windows(7,7)
+par(mfrow=c(2,2))
+plot(model)
+model2 <- update(model,subset=(tannin != 6))
+summary(model2)
+
+```
+# Section 10.2
+```{r}
+x <- seq(0,pi,0.01)
+y <- sin(x)
+plot(x,y,type="l",ylab="sin(x)")
+
+a1 <- x-x^3/factorial(3)
+lines(x,a1,col="green")
+a2 <- x-x^3/factorial(3)+x^5/factorial(5)
+lines(x,a2,col="red")
+
+```
+I had a problem here
+# Section 10.3
+```{r}
+par(mfrow=c(2,2))
+x <- seq(0,10,0.1)
+y1 <- 4 + 2 * x - 0.1 * x^2
+y2 <- 4 + 2 * x - 0.2 * x^2
+y3 <- 12 - 4 * x + 0.35 * x^2
+y4 <- 4 + 0.5 * x + 0.1 * x^2
+plot(x,y1,type="l",ylim=c(0,15),ylab="y",col="red")
+plot(x,y2,type="l",ylim=c(0,15),ylab="y",col="red")
+plot(x,y3,type="l",ylim=c(0,15),ylab="y",col="red")
+plot(x,y4,type="l",ylim=c(0,15),ylab="y",col="red")
+
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+poly <- read.table("diminish.txt",header=T)
+attach(poly)
+names(poly)
+
+windows(7,4)
+par(mfrow=c(1,2))
+model1 <- lm(yv~xv)
+plot(xv,yv,pch=21,col="brown",bg="yellow")
+abline(model1,col="navy")
+
+model2 <- lm(yv~xv+I(xv^2))
+
+plot(xv,yv,pch=21,col="brown",bg="yellow")
+x <- 0:90
+y <- predict(model2,list(xv=x))
+lines(x,y,col="navy")
+
+anova(model1,model2)
+
+```
+# Section 10.4
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("Decay.txt",header=T)
+names(data)
+attach(data)
+plot(time,amount,pch=21,col="blue",bg="brown")
+abline(lm(amount~time),col="green")
+
+model <- lm(log(amount)~time)
+summary(model)
+
+ts <- seq(0,30,0.02)
+left <- exp(predict(model,list(time=ts)))
+plot(time,amount,pch=21,col="blue",bg="brown")
+lines(ts,left,col="blue")
+
+```
+
+# Section 10.5
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+power <- read.table("power.txt",header=T)
+
+attach(power)
+names(power)
+
+plot(area,response,pch=21,col="green",bg="orange")
+abline(lm(response~area),col="blue")
+plot(log(area),log(response),pch=21,col="green",bg="orange")
+abline(lm(log(response)~log(area)),col="blue")
+
+model1 <- lm(response~area)
+model2 <- lm(log(response)~log(area))
+summary(model2)
+
+windows(7,7)
+plot(area,response,pch=21,col="green",bg="orange")
+abline(lm(response~area),col="blue")
+xv <- seq(1,2.7,0.01)
+yv <- exp(0.75378)*xv^0.24818
+lines(xv,yv,col="red")
+
+plot(area,response,xlim=c(0,5),ylim=c(0,4),pch=21,col="green",bg="orange")
+abline(lm(response~area),col="blue")
+xv <- seq(0,5,0.01)
+yv <- exp(0.75378)*xv^0.24818
+lines(xv,yv,col="red")
+
+```
+# Section 10.6
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+reg.data <- read.table("regression.txt",header=T)
+attach(reg.data)
+names(reg.data)
+plot(tannin,growth,pch=21,col="blue",bg="red")
+
+model <- lm(growth~tannin)
+abline(model,col="blue")
+coef(model)[2]
+
+summary(model)[[4]][4]
+
+se.lines <- function(model){
+  b1 <- coef(model)[2]+ summary(model)[[4]][4]
+  b2 <- coef(model)[2]- summary(model)[[4]][4]
+  xm <- sapply(model[[12]][2],mean)
+  ym <- sapply(model[[12]][1],mean)
+  a1 <- ym-b1*xm
+  a2 <- ym-b2*xm
+  abline(a1,b1,lty=2,col="blue")
+  abline(a2,b2,lty=2,col="blue")
+}
+se.lines(model)
+
+ci.lines <- function(model){
+  xm <- sapply(model[[12]][2],mean)
+  n <- sapply(model[[12]][2],length)
+  ssx <- sum(model[[12]][2]^2)-sum(model[[12]][2])^2/n
+  s.t <- qt(0.975,(n-2))
+  xv <- seq(min(model[[12]][2]),max(model[[12]][2]),length=100)
+  yv <- coef(model)[1]+coef(model)[2]*xv
+  se <- sqrt(summary(model)[[6]]^2*(1/n+(xv-xm)^2/ssx))
+  ci <- s.t*se
+  uyv <- yv+ci
+  lyv <- yv-ci
+  lines(xv,uyv,lty=2,col="blue")
+  lines(xv,lyv,lty=2,col="blue")
+}
+
+plot(tannin,growth,pch=21,col="blue",bg="red")
+abline(model, col="blue")
+ci.lines(model)
+
+plot(tannin,growth,pch=16,ylim=c(0,15))
+model <-lm(growth~tannin)
+
+xv <- seq(0,8,0.1)
+yv <- predict(model,list(tannin=xv),int="c")
+matlines(xv,yv,lty=c(1,2,2),col="black")
+
+```
+# Section 10.7
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.delim("lackoffit.txt")
+
+
+attach(data)
+names(data)
+
+plot(conc,jitter(rate),pch=16,col="red",ylim=c(0,8),ylab="rate")
+abline(lm(rate~conc),col="blue")
+
+model.reg <- lm(rate~conc)
+summary(model.reg)
+
+fac.conc <- factor(conc)
+model.aov <- aov(rate~fac.conc)
+summary(model.aov)
+
+anova(model.reg,model.aov)
+anova(lm(rate~conc+fac.conc))
+
+my <- as.vector(tapply(rate,fac.conc,mean))
+for (i in 0:6)
+  lines(c(i,i),c(my[i+1],predict(model.reg,list(conc=0:6))[i+1]),col="green")
+points(0:6,my,pch=16,col="green")
+
+
+
+```
+# Section 10.8
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+regdat <- read.table("regdat.txt",header=T)
+
+attach(regdat)
+names(regdat)
+
+plot(explanatory,response,pch=21,col="green",bg="red")
+model <- lm(response~explanatory)
+abline(model,col="blue")
+model
+
+b.boot <- numeric(10000)
+for (i in 1:10000){
+  indices <- sample(1:35,replace=T)
+  xv <- explanatory[indices]
+  yv <- response[indices]
+  model <- lm(yv~xv)
+  b.boot[i] <- coef(model)[2]
+}
+hist(b.boot,main="",col="green")
+
+quantile(b.boot,c(0.025,0.975))
+library(boot)
+reg.boot <- function(regdat, index){
+  xv <- explanatory[index]
+  yv <- response[index]
+  model <- lm(yv~xv)
+  coef(model)
+}
+
+reg.model <- boot(regdat,reg.boot,R=10000)
+boot.ci(reg.model,index=2)
+
+reg.model <- boot(regdat,reg.boot,R=10000)
+boot.ci(reg.model,index=2)
+
+model <- lm(response~explanatory)
+fit <- fitted(model)
+res <- resid(model)
+
+residual.boot <- function(res, index){
+  y <- fit+res[index]
+  model <- lm(y~explanatory)
+  coef(model) }
+
+res.model <- boot(res,residual.boot,R=10000)
+boot.ci(res.model,index=2)
+```
+# Section 10.9
+```{r}
+names(regdat)
+
+length(response)
+jack.reg <- numeric(35)
+for (i in 1:35) {
+  model <- lm(response[-i]~explanatory[-i])
+  jack.reg[i] <- coef(model)[2] }
+
+hist(jack.reg,main="",col="pink")
+
+model <- lm(response~explanatory)
+which(influence.measures(model)$infmat[,5]
+      == max(influence.measures(model)$infmat[,5]))
+
+
+plot(explanatory,response,pch=21,col="green",bg="red")
+abline(model,col="blue")
+abline(lm(response[-22]~explanatory[-22]),col="red")
+
+
+```
+
+# Section 10.10
+```{r}
+
+jack.after.boot(reg.model,index=2)
+
+
+
+```
+# Section 10.11
+```{r}
+library("car")
+durbinWatsonTest(model)
+dataEllipse(explanatory,response)
+
+```
+
+# Section 10.12
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("sasilwood.txt",header=T)
+
+attach(data)
+names(data)
+
+plot(log(Species)~log(Area),pch=21,col="red",bg="yellow")
+model1 <- lm(log(Species)~log(Area))
+par(mfrow=c(2,2))
+plot(model1)
+
+table(Area)
+Break <- sort(unique(Area))[3:11]
+
+d <- numeric(9)
+for (i in 1:9) {
+  model <-
+    lm(log(Species)~(Area<Break[i])*log(Area)+(Area>=Break[i])*log(Area))
+  d[i] <- summary(model)[[6]] }
+
+windows(7,4)
+par(mfrow=c(1,2))
+plot(log(Break),d,typ="l",col="red")
+Break[which(d==min(d))]
+
+model2 <- lm(log(Species)~log(Area)*(Area<100)+log(Area)*(Area>=100))
+anova(model1,model2)
+
+summary(model2)
+summary(model2)[[4]]
+
+a1 <- summary(model2)[[4]][1]+summary(model2)[[4]][3]
+a2 <- summary(model2)[[4]][1]
+b1 <- summary(model2)[[4]][2]+summary(model2)[[4]][4]
+b2 <- summary(model2)[[4]][2]
+
+plot(log(Area),log(Species),col="blue")
+lines(c(-5,4.6),c(a1+b1*-5,a1+b1*4.6),col="red")
+lines(c(4.6,15),c(a2+b2*4.6,a2+b2*15),col="red")
+```
+
+# Section 10.13.1
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+ozone.pollution <- read.table("ozone.data.txt",header=T)
+attach(ozone.pollution)
+names(ozone.pollution)
+pairs(ozone.pollution,panel=panel.smooth)
+
+library(mgcv)
+par(mfrow=c(2,2))
+model <- gam(ozone~s(rad)+s(temp)+s(wind))
+plot(model)
+
+library(tree)
+model <- tree(ozone~.,data=ozone.pollution)
+par(mfrow=c(1,1))
+plot(model)
+text(model)
+
+w2 <- wind^2
+t2 <- temp^2
+r2 <- rad^2
+tw <- temp*wind
+wr <- wind*rad
+tr <- temp*rad
+wtr <- wind*temp*rad
+
+model1 <- lm(ozone~rad+temp+wind+t2+w2+r2+wr+tr+tw+wtr)
+summary(model1)
+
+model2 <- update(model1,~.-wtr)
+summary(model2)
+
+model3 <- update(model2,~.-r2)
+summary(model3)
+
+model4 <- update(model3,~.-tr)
+summary(model4)
+
+model5 <- update(model4,~.-tw)
+summary(model5)
+
+model6 <- update(model5,~.-wr)
+summary(model6)
+
+par(mfrow=c(2,2))
+plot(model6)
+
+model7 <- lm(log(ozone) ~ rad+temp+wind+t2+w2+r2+wr+tr+tw+wtr)
+summary(model7)
+
+model8 <- update(model7,~.-wtr)
+summary(model8)
+model9 <- update(model8,~.-tr)
+summary(model9)
+model10 <- update(model9,~.-tw)
+summary(model10)
+model11 <- update(model10,~.-t2)
+summary(model11)
+model12 <- update(model11,~.-wr)
+summary(model12)
+
+plot(model12)
+
+
+```
+

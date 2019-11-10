@@ -1,0 +1,861 @@
+---
+title: "Nathan Wemmer"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+# Chapter 4
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+worms <- read.table("worms.txt",header=T)
+
+attach(worms)
+names(worms)
+head(worms)
+tail(worms)
+
+worms
+summary(worms)
+by(worms,Vegetation,mean)
+by(worms, Vegetation, function(x) lm(Worm.density ~ Soil.pH, data=x))
+```
+
+
+# Section 4.1
+```{r}
+worms[3,5]
+worms[14:19,7]
+worms[1:5,2:3]
+worms[3,]
+worms[,3]
+class(worms[3,])
+class(worms[,3])
+
+worms[,c(1,5)]
+
+```
+
+# Section 4.2
+```{r}
+worms[sample(1:20,8),]
+```
+
+# Section 4.3
+```{r}
+worms[order(Slope),]
+worms[rev(order(Slope)),]
+```
+
+# Section 4.4
+```{r}
+worms[Damp == T,]
+worms[Worm.density > median(Worm.density) & Soil.pH < 5.2,]
+worms[,sapply(worms,is.numeric)]
+worms[,sapply(worms,is.factor)]
+
+worms[-(6:15),]
+worms[!(Vegetation=="Grassland"),]
+worms[-which(Damp==F),]
+
+worms[!Damp==F,]
+worms[Damp==T,]
+```
+# Section 4.5
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("worms.missing.txt",header=F)
+data
+
+na.omit(data)
+new.frame <- na.exclude(data)
+```
+
+
+# 4.5.1 Replacing NAs with zeros
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("worms.missing.txt",header=F)
+data
+
+na.omit(data)
+new.frame <- na.exclude(data)
+data[is.na(data)]<-0
+
+```
+
+
+# Section 4.6
+```{r}
+new <- worms[rev(order(Worm.density)),]
+new[!duplicated(new$Vegetation),]
+```
+# Section 4.7
+```{r}
+worms[order(Vegetation,-Worm.density),]
+worms[order(-rank(Vegetation),-Worm.density),]
+names(worms)
+grep("S",names(worms))
+worms[,grep("S",names(worms))]
+
+```
+
+# Section 4.8
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+worms2 <- read.table("worms.txt",header=T,row.names=1)
+worms2
+```
+
+# Section 4.9
+```{r}
+x <- runif(10)
+y <- letters[1:10]
+z <- sample(c(rep(T,5),rep(F,5)))
+
+new <- data.frame(y,z,x)
+new
+
+y <- rpois(1500,1.5)
+table(y)
+
+short<-as.data.frame(table(y))
+short
+
+index<-rep(1:8,short$Freq)
+length(index)
+hist(index,-0.5:8.5)
+long<-short[index,]
+
+tail(long)
+long2 <- as.data.frame(lapply(short,
+                              function(x) rep(x, short$Freq)))
+tail(long2)
+```
+# Section 4.10
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+dups <- read.table("dups.txt",header=T)
+dups
+unique(dups)
+
+dups[duplicated(dups),]
+
+```
+
+# Section 4.11
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+nums <- read.table("sortdata.txt",header=T)
+attach(nums)
+head(nums)
+nums[order(date),]
+dates <- strptime(date,format="%d/%m/%Y")
+dates
+nums <- cbind(nums,dates)
+nums[order(dates),]
+
+```
+# Section 4.12
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+unique(worms$Vegetation)
+herbicides <- read.table("herbicides.txt",header=T)
+herbicides
+
+herbicides$Herbicide[match(worms$Vegetation,herbicides$Type)]
+worms$hb <- herbicides$Herbicide[match(worms$Vegetation,herbicides$Type)]
+
+recs <- data.frame(
+  worms,hb=herbicides$Herbicide[match(worms$Vegetation,herbicides$Type)])
+recs
+
+```
+# Section 4.13
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+(lifeforms <- read.table("lifeforms.txt",header=T))
+
+(flowering <- read.table("fltimes.txt",header=T))
+
+merge(flowering,lifeforms)
+
+(both <- merge(flowering,lifeforms,all=T))
+
+(seeds <- read.table("seedwts.txt",header=T))
+
+merge(both,seeds,by.x=c("Genus","species"),by.y=c("name1","name2"))
+```
+# Section 4.14
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+frame <- read.table("sales.txt",header=T)
+frame
+
+people <- rowMeans(frame[,2:5])
+people <- people-mean(people)
+people
+
+(new.frame <- cbind(frame,people))
+seasons <- colMeans(frame[,2:5])
+seasons <- seasons-mean(seasons)
+seasons
+
+new.row <- new.frame[1,]
+new.row[1] <- "seasonal effects"
+new.row[2:5] <- seasons
+new.row[6] <- 0
+new.row
+
+(new.frame <- rbind(new.frame,new.row))
+gm <- mean(unlist(new.frame[1:5,2:5]))
+gm <- rep(gm,4)
+new.frame[1:5,2:5] <- sweep(new.frame[1:5,2:5],2,gm)
+new.frame
+new.frame[6,6] <- gm[1]
+new.frame
+
+```
+
+# Section 4.15
+```{r}
+aggregate(worms[,c(2,3,5,7)],by=list(veg=Vegetation),mean)
+
+aggregate(worms[,c(2,3,5,7)],by=list(veg=Vegetation,d=Damp),mean)
+
+```
+
+
+
+
+
+
+
+# Chapter 5
+# Section 5.1
+None
+# Section 5.2
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data1 <- read.table("scatter1.txt",header=T)
+
+attach(data1)
+names(data1)
+
+head(data1)
+tail(data1)
+
+
+plot(xv,ys,col="red")
+
+plot(xv,ys,col="red",xlab="Explanatory variable",ylab="Response variable")
+abline(lm(ys~xv))
+
+
+#data2 <- read.table("scatter2.txt",header=T)
+data2 <- read.table("scatter2.txt",header=T)
+
+attach(data2)
+names(data2)
+
+points(xv2,ys2,col="blue",pch=16)
+abline(lm(ys2~xv2))
+
+plot(c(xv,xv2),c(ys,ys2),xlab="Explanatory variable",
+     ylab="Response variable",type="n")
+
+points(xv,ys,col="red")
+points(xv2,ys2,col="blue",pch=16)
+abline(lm(ys~xv))
+abline(lm(ys2~xv2))
+
+range(c(xv,xv2))
+range(c(ys,ys2))
+
+plot(c(xv,xv2),c(ys,ys2),xlim=c(0,100),ylim=c(0,70),
+     xlab="Explanatory variable",ylab="Response variable",type="n")
+points(xv,ys,col="red")
+points(xv2,ys2,col="blue",pch=16)
+abline(lm(ys~xv))
+abline(lm(ys2~xv2))
+# click the mouse button when the cursor is where you want to 
+# the top left of the box around the legend to be
+legend(locator(1),c("treatment","control"),pch=c(1,16), col=c("red","blue"))
+```
+
+# Section 5.2.1
+```{r}
+plot(0:10,0:10,xlim=c(0,32),ylim=c(0,40),type="n",xaxt="n",yaxt="n",
+     xlab="",ylab="")
+x <- seq(1,31,2)
+s <- -16
+f <- -1
+for (y in seq(2,40,2.5)) {
+  s <- s+16
+  f <- f+16
+  y2 <- rep(y,16)
+  points(x,y2,pch=s:f,cex=0.7)
+  text(x,y-1,as.character(s:f),cex=0.6) }
+```
+# Section 5.2.2
+```{r}
+plot(0:9,0:9,pch=16,type="n",xaxt="n",yaxt="n",ylab="col",xlab="bg")
+axis(1,at=1:8)
+axis(2,at=1:8)
+for (i in 1:8) points(1:8,rep(i,8),pch=c(21,22,24),bg=1:8,col=i)
+```
+# Section 5.2.3
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+map.places <- read.csv("map.places.csv",header=T)
+attach(map.places)
+names(map.places)
+
+map.data <- read.csv("bowens.csv",header=T)
+attach(map.data)
+names(map.data)
+
+nn <- ifelse(north<60,north+100,north)
+windows(9,7)
+plot(c(20,100),c(60,110),type="n",xlab="",ylab="",xaxt="n", yaxt="n")
+for (i in 1:length(wanted)){
+  ii <- which(place == as.character(wanted[i]))
+  text(east[ii], nn[ii], as.character(place[ii]), cex = 0.6) }
+
+```
+# Section 5.2.4
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("sleep.txt",header=T)
+attach(data)
+plot(Days,Reaction)
+s <- as.numeric(factor(Subject))
+
+plot(Days,Reaction,type="n")
+for (k in 1:max(s)){
+  x <- Days[s==k]
+  y <- Reaction[s==k]
+  lines(x,y,type="b",col="gray")
+}
+
+sym <- rep(c(21,22,24),c(7,7,4))
+bcol <- c(2:8,2:8,2:5)
+
+for (k in 1:max(s)){
+  points(Days[s==k],Reaction[s==k],pch=sym[k],bg=bcol[k],col=1)
+}
+
+```
+# Section 5.2.5
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("pgr.txt",header=T)
+
+attach(data)
+names(data)
+
+plot(hay,pH)
+text(hay, pH, labels=round(FR, 2), pos=1, offset=0.5,cex=0.7)
+
+plot(hay,pH,pch=16,col=ifelse(FR>median(FR),"red","black"))
+legend(locator(1),c("FR>median","FR<=median"),pch=16,col=c("red","black"))
+```
+# Section 5.2.6
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+smooth <- read.table("smoothing.txt",header=T)
+attach(smooth)
+names(smooth)
+
+plot(x,y,pch=16)
+sequence <- order(x)
+lines(x[sequence],y[sequence])
+
+plot(x,y,pch=16)
+lines(x,y)
+```
+# Section 5.2.7
+```{r}
+x<-0:10
+y<-0:10
+plot(x,y)
+lines(x,y,col="red")
+lines(x,y,col="blue",type="s")
+lines(x,y,col="green",type="S")
+```
+# Section 5.3
+```{r}
+plot(0:10,0:10,xlab="",ylab="",xaxt="n",yaxt="n",type="n")
+rect(6,6,9,9)
+
+```
+# Section 5.3.1
+```{r}
+plot(0:10,0:10,xlab="",ylab="",xaxt="n",yaxt="n",type="n")
+rect(6,6,9,9)
+
+corners <- function(){
+  coos <- c(unlist(locator(1)),unlist(locator(1)))
+  rect(coos[1],coos[2],coos[3],coos[4])
+}
+
+corners()
+arrows(1,1,3,8)
+arrows(1,9,5,9,code=3)
+arrows(4,1,4,6,code=3,angle=90)
+
+click.arrows <- function(){
+  coos <- c(unlist(locator(1)),unlist(locator(1)))
+  arrows(coos[1],coos[2],coos[3],coos[4])
+}
+
+click.arrows()
+locations <- locator(6)
+class(locations)
+locations
+polygon(locations,col="lavender")
+
+```
+# Section 5.3.2
+```{r}
+z <- seq(-3,3,0.01)
+pd <- dnorm(z)
+plot(z,pd,type="l")
+polygon(c(z[z<=-1],-1),c(pd[z<=-1],pd[z==-3]),col="red")
+
+```
+
+# Section 5.4
+```{r}
+curve(x^3-3*x, -2, 2)
+x <- seq(-2,2,0.01)
+y <- x^3-3*x
+plot(x,y,type="l")
+
+```
+
+# Section 5.4.1
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+xv <- 0:100
+yA <- 482*xv*exp(-0.045*xv)
+yB <- 518*xv*exp(-0.055*xv)
+
+plot(c(xv,xv),c(yA,yB),xlab="stock",ylab="recruits",type="n")
+lines(xv,yA,lty=2,col="blue")
+lines(xv,yB,lty=1,col="red")
+
+# setwd("F:/JunYe_Files/Jun_2016Spring_Course/Spring2016_Advanced_Computinbg/therbook")
+#info <- read.table("plotfit.txt",header=T)
+#info <- read.table("c:\\temp\\plotfit.txt",header=T)
+
+# I created a new data plotfit_new where I use xxx and yyy as names
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+info <- read.table("plotfit_new.txt",header=F)
+attach(info)
+names(info)
+
+points(xxx,yyy,pch=16)
+```
+# Section 5.4.3
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("jaws.txt",header=T)
+attach(data)
+names(data)
+par(mfrow=c(2,2))
+
+plot(age,bone,pch=16,main="lowess")
+lines(lowess(age,bone),col="red")
+
+plot(age,bone,pch=16,main="loess")
+model <- loess(bone~age)
+xv <- 0:50
+yv <- predict(model,data.frame(age=xv))
+lines(xv,yv,col="red")
+
+library(mgcv)
+plot(age,bone,pch=16,main="gam")
+model <- gam(bone~s(age))
+xv <- 0:50
+yv <- predict(model,list(age=xv))
+lines(xv,yv,col="red")
+
+plot(age,bone,pch=16,main="cubic polynomial")
+model <- lm(bone~age+I(age^2)+I(age^3))
+xv <- 0:50
+yv <- predict(model,list(age=xv))
+lines(xv,yv,col="red")
+
+```
+
+# Section 5.5
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("pollute.txt",header=T)
+attach(data)
+
+par(mfrow=c(1,2))
+plot(Population,Pollution)
+plot(Temp,Pollution)
+
+windows(7,4)
+par(mfrow=c(1,2))
+plot(Population,Pollution)
+plot(Temp,Pollution)
+
+```
+# Section 5.6
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+weather <- read.table("SilwoodWeather.txt",header=T)
+attach(weather)
+names(weather)
+
+month <- factor(month)
+plot(month,upper)
+plot(month,upper,ylab="daily maximum temperature",xlab="month")
+
+
+
+```
+# 5.6.1 Boxplots with notches to indicate significant differences
+# 5.6.2 Barplots with error bars
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+trial <- read.table("compexpt.txt",header=T)
+attach(trial)
+names(trial)
+means <- tapply(biomass,clipping,mean)
+barplot(means,xlab="treatment",ylab="mean yield",col="green")
+
+seBars <- function(x,y){
+  model <- lm(y~factor(x))
+  reps <- length(y)/length(levels(x))
+  sem <- summary(model)$sigma/sqrt(reps)
+  m <- as.vector(tapply(y,x,mean))
+  upper <- max(m)+sem
+  nn <- as.character(levels(x))
+  xs <- barplot(m,ylim=c(0,upper),names=nn,
+                ylab=deparse(substitute(y)),xlab=deparse(substitute(x)))
+  for (i in 1:length(xs)) {
+    arrows(xs[i],m[i]+sem,xs[i],m[i]-sem,angle=90,code=3,length=0.1) }
+}
+
+seBars(clipping,biomass)
+windows(7,4)
+par(mfrow=c(1,2))
+plot(clipping,biomass)
+plot(clipping,biomass,notch=T)
+```
+# Section 5.6.3
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("box.txt",header=T)
+attach(data)
+names(data)
+plot(response~factor(fact),notch=TRUE)
+
+index <- order(tapply(response,fact,mean))
+ordered <- factor(rep(index,rep(20,8)))
+boxplot(response~ordered,notch=T,names=as.character(index),
+        xlab="ranked treatments",ylab="response")
+model <- aov(response~factor(fact))
+summary(model)
+
+plot(TukeyHSD(model))
+```
+# Section 5.6.4
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("silwoodweather.txt",header=T)
+attach(data)
+month <- factor(month)
+season <- heat.colors(12)
+temp <- c(11,10,8,5,3,1,2,3,5,8,10,11)
+plot(month,upper,col=season[temp])
+```
+# Section 5.7.1
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data<-read.table("daphnia.txt",header=T)
+attach(data)
+names(data)
+
+par(mfrow=c(1,2))
+hist(Growth.rate,seq(0,8,0.5),col="green",main="")
+y <- as.vector(tapply(Growth.rate,list(Daphnia,Detergent),mean))
+barplot(y,col="green",ylab="Growth rate",xlab="Treatment")
+```
+
+# Section 5.7.2
+```{r}
+par(mfrow=c(2,2))
+hist(Growth.rate,seq(0,8,0.25),col="green",main="")
+hist(Growth.rate,seq(0,8,0.5),col="green",main="")
+hist(Growth.rate,seq(0,8,2),col="green",main="")
+hist(Growth.rate,c(0,3,4,8),col="green",main="")
+
+range(Growth.rate)
+
+edges <- c(0,3,4,8)
+
+bin <- cut(Growth.rate,edges)
+bin
+
+is.factor(bin)
+
+table(bin)
+
+sum(table(bin))
+
+diff(edges)
+
+(table(bin)/sum(table(bin)))/diff(edges)
+```
+# Section 5.7.3
+```{r}
+values <- rpois(1000,1.70)
+hist(values,main="",xlab="random numbers from a Poisson with mean 1.7")
+
+hist(values,breaks=(-0.5:8.5),main="",
+     xlab="random numbers from a Poisson with mean 1.7")
+```
+# Section 5.7.4
+```{r}
+
+y <- rnbinom(158,mu=1.5,size=1)
+bks <- -0.5:(max(y)+0.5)
+hist(y,bks,main="")
+mean(y)
+
+var(y)
+
+mean(y)^2/(var(y)-mean(y))
+
+xs <- 0:11
+ys <- dnbinom(xs,size=1.2788,mu=1.772)
+lines(xs,ys*158)
+
+```
+
+# Section 5.7.5
+```{r}
+library(MASS)
+attach(faithful)
+
+(max(eruptions)-min(eruptions))/(2*(1+log(length(eruptions),base=2)))
+
+windows(7,4)
+par(mfrow=c(1,2))
+hist(eruptions,15,freq=FALSE,main="",col=27)
+lines(density(eruptions,width=0.6,n=200))
+truehist(eruptions,nbins=15,col=27)
+lines(density(eruptions,n=200))
+
+```
+
+# Section 5.7.6
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+response <- read.table("das.txt",header=T)
+plot(response$y)
+which(response$y > 15)
+
+response$y[50]
+
+response$y[50] <- 2.179386
+
+plot(response$y)
+
+data(UKLungDeaths)
+ts.plot(ldeaths, mdeaths, fdeaths, xlab="year", ylab="deaths", lty=c(1:3))
+
+data(sunspots)
+plot(sunspots)
+class(sunspots)
+is.ts(sunspots)
+
+str(sunspots)
+```
+# Section 5.7.8
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.csv("piedata.csv")
+data
+
+```
+# Section 5.7.9
+```{r}
+data(OrchardSprays)
+with(OrchardSprays,
+     stripchart(decrease ~ treatment,
+                ylab = "decrease", vertical = TRUE, log = "y"))
+
+```
+# Section 5.7.10
+```{r}
+normal.plot <- function(y) {
+  s <- sd(y)
+  plot(c(0,3),c(min(0,mean(y)-s * 4*
+                      qnorm(0.75)),max(y)),xaxt="n",xlab="",type="n",ylab="")
+  # for your data's boxes and whiskers, centred at x = 1
+  top <- quantile(y,0.75)
+  bottom <- quantile(y,0.25)
+  w1u <- quantile(y,0.91)
+  w2u <- quantile(y,0.98)
+  w1d <- quantile(y,0.09)
+  w2d <- quantile(y,0.02)
+  rect(0.8,bottom,1.2,top)
+  lines(c(0.8,1.2),c(mean(y),mean(y)),lty=3)
+  lines(c(0.8,1.2),c(median(y),median(y)))
+  lines(c(1,1),c(top,w1u))
+  lines(c(0.9,1.1),c(w1u,w1u))
+  lines(c(1,1),c(w2u,w1u),lty=3)
+  lines(c(0.9,1.1),c(w2u,w2u),lty=3)
+  ou <- length(y[y>w2u])
+  points(rep(1,nou),jitter(y[y>w2u]))
+  lines(c(1,1),c(bottom,w1d))
+  lines(c(0.9,1.1),c(w1d,w1d))
+  lines(c(1,1),c(w2d,w1d),lty=3)
+  lines(c(0.9,1.1),c(w2d,w2d),lty=3)
+  nod <- length(y[y<w2d])
+  points(rep(1,nod),jitter(y[y<w2d]))
+  #for the normal box and whiskers, centred at x = 2
+  n75 <- mean(y)+ s * qnorm(0.75)
+  n25 <- mean(y)- s * qnorm(0.75)
+  n91 <- mean(y)+ s * 2* qnorm(0.75)
+  n98 <- mean(y)+ s * 3* qnorm(0.75)
+  n9 <- mean(y)- s * 2* qnorm(0.75)
+  n2 <- mean(y)- s * 3* qnorm(0.75)
+  rect(1.8,n25,2.2,n75)
+  lines(c(1.8,2.2),c(mean(y),mean(y)),lty=3)
+  lines(c(2,2),c(n75,n91))
+  lines(c(1.9,2.1),c(n91,n91))
+  lines(c(2,2),c(n98,n91),lty=3)
+  lines(c(1.9,2.1),c(n98,n98),lty=3)
+  lines(c(2,2),c(n25,n9))
+  lines(c(1.9,2.1),c(n9,n9))
+  lines(c(2,2),c(n9,n2),lty=3)
+  lines(c(1.9,2.1),c(n2,n2),lty=3)
+  lines(c(1.2,1.8),c(top,n75),lty=3,col="gray")
+  lines(c(1.1,1.9),c(w1u,n91),lty=3,col="gray")
+  lines(c(1.1,1.9),c(w2u,n98),lty=3,col="gray")
+  lines(c(1.2,1.8),c(bottom,n25),lty=3,col="gray")
+  lines(c(1.1,1.9),c(w1d,n9),lty=3,col="gray")
+  lines(c(1.1,1.9),c(w2d,n2),lty=3,col="gray")
+  # label the two boxes
+  axis(1,c(1,2),c("data","normal")) }
+
+y <- rnbinom(100,1,0.2)
+
+normal.plot(y)
+
+```
+
+# Section 5.8.1
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+ozonedata <- read.table("ozone.data.txt",header=T)
+attach(ozonedata)
+names(ozonedata)
+
+pairs(ozonedata,panel=panel.smooth)
+
+```
+# Section 5.8.2
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+ozonedata <- read.table("ozone.data.txt",header=T)
+attach(ozonedata)
+names(ozonedata)
+
+pairs(ozonedata,panel=panel.smooth)
+
+coplot(ozone~wind|temp,panel = panel.smooth)
+
+```
+# Section 5.8.3
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+yields <- read.table("splityield.txt",header=T)
+attach(yields)
+names(yields)
+
+interaction.plot(fertilizer,irrigation,yield)
+
+
+```
+
+# Section 5.9.1
+```{r}
+plot.design(Growth.rate~Water*Detergent*Daphnia)
+plot.design(Growth.rate~Water*Detergent*Daphnia,
+            fun=function(x) sqrt(var(x)/3) )
+
+```
+
+# Section 5.9.2
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+bubble.plot <- function(xv,yv,rv,bs=0.1){
+  r <- rv/max(rv)
+  yscale <- max(yv)-min(yv)
+  xscale <- max(xv)-min(xv)
+  plot(xv,yv,type="n", xlab=deparse(substitute(xv)),
+       ylab=deparse(substitute(yv)))
+  for (i in 1:length(xv)) bubble(xv[i],yv[i],r[i],bs,xscale,yscale) }
+bubble <- function (x,y,r,bubble.size,xscale,yscale) {
+  theta <- seq(0,2*pi,pi/200)
+  yv <- r*sin(theta)*bubble.size*yscale
+  xv <- r*cos(theta)* bubble.size*xscale
+  lines(x+xv,y+yv) }
+
+ddd <- read.table("pgr.txt",header=T)
+attach(ddd)
+names(ddd)
+bubble.plot(hay,pH,FR)
+
+```
+# Section 5.9.3
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+numbers <- read.table("longdata.txt",header=T)
+attach(numbers)
+names(numbers)
+
+plot(jitter(xlong,amount=1),jitter(ylong,amount=1),xlab="input",ylab="count")
+sunflowerplot(xlong,ylong)
+```
+
+# Section 5.10
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("pollute.txt",header=T)
+attach(data)
+
+pdf("pollution.pdf",width=7,height=4)
+par(mfrow=c(1,2))
+plot(Population,Pollution)
+plot(Temp,Pollution)
+dev.off()
+
+postscript("pollution.ps",width=7,height=4)
+par(mfrow=c(1,2))
+plot(Population,Pollution)
+plot(Temp,Pollution)
+dev.off()
+
+```
+

@@ -1,0 +1,548 @@
+---
+title: "Nathan Wemmer"
+output:
+  html_notebook: default
+  word_document: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+# 2.15 Writing R functions
+
+```{r}
+arithmetic.mean <- function(x) sum(x)/length(x)
+y <- c(3,3,4,5,5)
+arithmetic.mean(y)
+# there is a built-in function for arithmetic means called mean
+mean(y)
+```
+# 2.15.2 Median of a single sample
+
+```{r}
+med <- function(x) {
+  odd.even <- length(x)%%2
+  if (odd.even == 0) (sort(x)[length(x)/2]+sort(x)[1+ length(x)/2])/2
+  else sort(x)[ceiling(length(x)/2)]
+}
+med(y)
+
+med(y[-1])
+
+med <- function(x) ifelse(length(x)%%2==1, sort(x)[ceiling(length(x)/2)],
+                          (sort(x)[length(x)/2]+sort(x)[1+ length(x)/2])/2 )
+
+
+```
+
+# 2.15.3 Geometric mean
+
+```{r}
+100000^0.2
+insects <- c(1,10,1000,10,1)
+mean(insects)
+
+exp(mean(log(insects)))
+geometric <- function (x) exp(mean(log(x)))
+geometric(insects)
+```
+
+
+# 2.15.4 Harmonic mean
+
+```{r}
+harmonic <- function (x) 1/mean(1/x)
+harmonic(c(1,2,4,1))
+```
+
+# 2.15.6 Degrees of freedom
+
+```{r}
+y <- c(13,7,5,12,9,15,6,11,9,7,12)
+variance <- function(x) sum((x - mean(x))^2)/(length(x)-1)
+variance(y)
+var(y)
+```
+# 2.15.7 Variance ratio test
+
+```{r}
+variance.ratio <- function(x,y) {
+  v1 <- var(x)
+  v2 <- var(y)
+  if (var(x) > var(y)){
+    vr <- var(x)/var(y)
+    df1 <- length(x)-1
+    df2 <- length(y)-1}
+  else {
+    vr <- var(y)/var(x)
+    df1 <- length(y)-1
+    df2 <- length(x)-1}
+  2*(1-pf(vr,df1,df2)) }
+
+a <- rnorm(10,15,2)
+b <- rnorm(10,15,4)
+variance.ratio(a,b)
+
+# We can compare our p with the p value given by the built-in function called var.test:
+var.test(a,b)
+
+```
+
+
+# 2.15.8 Using variance
+
+```{r}
+se <- function(x) sqrt(var(x)/length(x))
+ci95 <- function(x) {
+  t.value <- qt(0.975,length(x)-1)
+  standard.error <- se(x)
+  ci <- t.value*standard.error
+  cat("95 Confidence Interval = ", mean(x) -ci, "to ", mean(x) +ci,"\n") }
+
+x <- rnorm(150,25,3)
+ci95(x)
+
+xv <- rnorm(30)
+sem <- numeric(30)
+sem[1] <- NA
+for(i in 2:30) sem[i] <- se(xv[1:i])
+plot(1:30,sem,ylim=c(0,0.8),
+     ylab="standard error of mean",xlab="sample size n",pch=16)
+
+
+xv <- rnorm(30)
+sem <- numeric(30)
+sem[1] <- NA
+for(i in 2:30) sem[i] <- se(xv[1:i])
+plot(1:30,sem,ylim=c(0,0.8),
+     ylab="standard error of mean",xlab="sample size n",pch=16)
+lines(2:30,1/sqrt(2:30))
+
+```
+
+# 2.15.9 Deparsing: A graphics function for error bars
+
+```{r}
+error.bars <- function(yv,z,nn){
+  xv <-
+    barplot(yv,ylim=c(0,(max(yv)+max(z))),names=nn,ylab=deparse(substitute(yv)
+    ))
+  g=(max(xv)-min(xv))/50
+  for (i in 1:length(xv)) {
+    lines(c(xv[i],xv[i]),c(yv[i]+z[i],yv[i]-z[i]))
+    lines(c(xv[i]-g,xv[i]+g),c(yv[i]+z[i], yv[i]+z[i]))
+    lines(c(xv[i]-g,xv[i]+g),c(yv[i]-z[i], yv[i]-z[i]))
+  }}
+
+comp <- read.table("competition.txt",header=T)
+attach(comp)
+names(comp)
+
+se <- rep(28.75,5)
+labels <- as.character(levels(clipping))
+ybar <- as.vector(tapply(biomass,clipping,mean))
+
+error.bars(ybar,se,labels)
+
+xy.error.bars <- function (x,y,xbar,ybar){
+  plot(x, y, pch=16, ylim=c(min(y-ybar),max(y+ybar)),
+       xlim=c(min(x-xbar),max(x+xbar)))
+  arrows(x, y-ybar, x, y+ybar, code=3, angle=90, length=0.1)
+  arrows(x-xbar, y, x+xbar, y, code=3, angle=90, length=0.1) }
+
+x <- rnorm(10,25,5)
+y <- rnorm(10,100,20)
+xb <- runif(10)*5
+yb <- runif(10)*20
+xy.error.bars(x,y,xb,yb)
+```
+# 2.15.10 The switch function
+
+```{r}
+central <- function(y, measure) {
+  switch(measure,
+         Mean = mean(y),
+         Geometric = exp(mean(log(y))),
+         Harmonic = 1/mean(1/y),
+         Median = median(y),
+         stop("Measure not included")) }
+
+central(rnorm(100,10,2),"Harmonic")
+central(rnorm(100,10,2),4)
+
+```
+
+# 2.15.13 Optional arguments
+
+```{r}
+charplot <- function(x,y,pc=16,co="red"){
+  plot(y~x,pch=pc,col=co)}
+
+charplot(1:10,1:10)
+plot(y~x,pch=pc,col=co)
+
+
+charplot(1:10,1:10)
+charplot(1:10,1:10,17)
+charplot(1:10,1:10,co="navy")
+
+charplot(1:10,1:10,15,"green")
+charplot(1:10,1:10,"green",15)
+charplot(1:10,1:10,co="green",pc=15)
+```
+
+# 2.15.14 Variable numbers of arguments ( . . . )
+
+```{r}
+many.means <- function ( ...) {
+  data <- list( ...)
+  n <- length(data)
+  means <- numeric(n)
+  vars <- numeric(n)
+  for (i in 1:n) {
+    means[i] <- mean(data[[i]])
+    vars[i] <- var(data[[i]])
+  }
+  print(means)
+  print(vars)
+  invisible(NULL)
+}
+
+x <- rnorm(100)
+y <- rnorm(200)
+z <- rnorm(300)
+
+many.means(x,y,z)
+```
+
+
+# 2.15.15 Returning values from a function
+
+```{r}
+parmax <- function (a,b) {
+  c <- pmax(a,b)
+  median(c) }
+
+x <- c(1,9,2,8,3,7)
+y <- c(9,2,8,3,7,2)
+parmax(x,y)
+
+parboth <- function (a,b) {
+  c <- pmax(a,b)
+  d <- pmin(a,b)
+  answer <- list(median(c),median(d))
+  names(answer)[[1]] <- "median of the parallel maxima"
+  names(answer)[[2]] <- "median of the parallel minima"
+  return(answer) }
+
+parboth(x,y)
+
+```
+
+
+# 2.15.16 Anonymous functions
+
+```{r}
+(function(x,y){ z <- 2* x^2 + y^2; x+y+z })(0:7, 1)
+
+```
+
+# 2.15.17 Flexible handling of arguments to functions
+
+```{r}
+# 2.15.17 Flexible handling of arguments to functions
+plotx2 <- function (x, y = z^2) {
+  z <- 1:x
+  plot(z,y,type="l") }
+
+windows(7,4)
+par(mfrow=c(1,2))
+plotx2(12)
+plotx2(12,1:12)
+
+```
+
+
+
+# 2.15.18 Structure of an object: str
+
+```{r}
+(y <- seq(0.9,0.3,-0.1))
+
+str(y)
+#data <- read.table("c:\\temp\\spino.txt",header=T)
+data <- read.table("spino.txt",header=T)
+str(data)
+
+#data <- read.table("c:\\temp\\spino.txt",header=T)
+data <- read.table("spino.txt",header=T)
+attach(data)
+y <- factor(1+(condition=="better")+(condition=="much.better"))
+model <- glm(y~treatment,binomial)
+summary(model)
+
+str(model)
+
+```
+# 2.16
+```{r}
+# 2.16.2 Saving history
+history(Inf)
+savehistory(file = "session18.txt")
+loadhistory(file = "session18.txt")
+
+# 2.16.3 Saving graphics
+pdf("fig1.pdf")
+dev.off()
+
+# 2.16.4 Saving data produced within R to disc
+nbnumbers <- rnbinom(1000, size=1, mu=1.2)
+write(nbnumbers,"nbnumbers.txt",1)
+xmat <- matrix(rpois(100000,0.75),nrow=1000)
+write.table(xmat,"table.txt",col.names=F,row.names=F)
+
+nbtable <- table(nbnumbers)
+nbtable
+
+write.table(nbtable,"table.txt",col.names=F,row.names=F)
+write.table(unclass(nbtable),"table.txt",col.names=F,row.names=F)
+
+# 2.16.5 Pasting into an Excel spreadsheet
+writeClipboard(as.character(factor.name))
+writeClipboard(as.character(numeric.variable))
+
+data <- read.table("worms.txt",header=T)
+write.table(data,"clipboard",sep="\t",col.names=NA)
+
+```
+
+
+
+
+
+# 3.1
+
+```{r}
+y <- c (6,7,3,4,8,5,6,2)
+
+x <-scan()
+setwd("c:\Users\Nathan\Desktop\Important Docs\school\stats db\therbook")
+getwd()
+
+mine<-getwd()
+setwd("C:\Users\Nathan\Desktop\Important Docs\school\stats db\therbook")
+setwd(mine)
+dir("C:\Users\Nathan\Desktop\Important Docs\school\stats db\therbook")
+data<-read.table(file.choose(),header=T)
+
+```
+
+# 3.2 Data input from files
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+getwd()
+
+
+```
+
+# 3.2.2 Data input using read.table
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook")
+data <- read.table("yields.txt",header=T)
+head(data)
+```
+```{r}
+data <- read.delim("yields.txt")
+rt <- function(x) read.table(paste("c:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook",x,".txt",sep=""),
+header=TRUE)
+data <- rt("yields.txt")
+```
+```{r}
+map <- read.table("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/bowens.csv",header=T,sep=",")
+murder <- read.table("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/murders.txt",header=T,as.is="region")
+data2 <- read.table("http://www.bio.ic.ac.uk/research/mjcraw/therbook/data/cancer.txt",header=T)
+head(data2)
+```
+
+# 3.3 Input from files using scan
+```{r}
+read.table("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt")
+scan("worms.txt",skip=1,what=as.list(rep("",7)))
+data <-as.data.frame(scan("worms.txt",skip=1,what=as.list(rep("",7))))
+
+header <- unlist(scan"worms.txt", nlines=1,what=as.list(rep("",7)))
+
+names(data)<-header
+head(data)
+```
+# 3.3.2 Input from more complex file structures using scan
+
+```{r}
+scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt")
+scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt",sep="\n")
+scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt",sep="\t")
+length(scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt",sep="\n"))
+length(scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt",sep="\t"))
+scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt",sep="\t")[1:4]
+```
+
+```{r}
+as.numeric(na.omit(scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt",sep="\t",quiet=T)[1:4]))
+
+sapply(1:5, function(i)
+  as.numeric(na.omit(
+    scan("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt",sep="\t",quiet=T)[(4*i-3):
+                                                (4*i)])))
+
+```
+# 3.4 Reading data from a file using readLines
+
+```{r}
+line<-readLines("worms.txt")
+line
+
+db<-strsplit(line,"\t")
+db
+bb<-unlist(db)
+dim(bb)<-c(7,21)
+bb
+t(bb)[-1,]
+
+frame<-as.data.frame(t(bb)[-1,])
+head(frame)
+
+
+names(frame)<-t(bb)[1,]
+head(frame)
+
+
+```
+# 3.4.2 Reading non-standard files using readLines
+
+
+```{r}
+readLines("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt")
+strsplit(readLines("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt"),"\t")
+strsplit(readLines("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt"),"\n")
+
+rows<-lapply(strsplit(readLines("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/rt.txt"),"\t"),as.numeric)
+rows
+
+sapply(1:5, function(i) as.numeric(na.omit(rows[[i]])))
+
+```
+
+# 3.5 Warnings when you attach the dataframe
+```{r}
+murder <- read.table("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/murders.txt",header=T,as.is="region")
+attach(murder)
+
+head(murder)
+table(region)
+
+table(murder$region)
+```
+
+# 3.6
+```{r}
+
+z <- 10
+z <- 2.5
+```
+
+
+# 3.7
+```{r}
+data<-read.table("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/catdata.txt",header=F)
+attach(data)
+names(data)
+
+model<-lm(y~soil)
+summary.aov(model)
+
+df1<-unlist(summary.aov(model)[[1]] [1])[1]
+df2<-unlist(summary.aov(model)[[1]] [1])[2]
+ss1<-unlist(summary.aov(model)[[1]] [2])[1]
+ss2<-unlist(summary.aov(model)[[1]] [2])[2]
+
+{cat("ANOVA table","\n")
+  cat("Source","\t\t","SS","\t","d.f.","\t","MS","\t\t","F","\n")
+  cat("Treatment","\t",ss1,"\t",df1,"\t",ss1/df1,"\t\t",
+      (ss1/df1)/(ss2/df2),"\n")
+  cat("Error","\t\t",ss2,"\t",df2,"\t",ss2/df2,"\n")
+  cat("Total","\t\t",ss1 + ss2,"\t",df1 + df2,"\n")}
+
+
+```
+# 3.8 checking files from the command line
+
+```{r}
+file.exists("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/Decay.txt")
+
+```
+
+# 3.11 File Paths
+```{r}
+setwd("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/thesis/chapter1/data")
+basename("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/thesis/chapter1/data/problemA")
+dirname("C:/Users/Nathan/Desktop/Important Docs/school/stats db/therbook/thesis/chapter1/data/problemA")
+
+A <- "c:"
+B <- "temp"
+C <- "thesis"
+D <- "chapter1"
+E <- "data"
+F <- "problemA"
+file.path(A,B,C,D,E,F)
+file.path(A,B,C,D,E,F,fsep="\\")
+
+```
+
+# 3.12 Connections
+```{r}
+file(description = "", open = "", blocking = TRUE,
+     encoding = getOption("encoding"), raw = FALSE)
+```
+# 3.13.2 Setting up R to read from the database
+
+```{r}
+install.packages("RODBC")
+library(RODBC)
+channel <- odbcConnect("northwind")
+
+query <- "SELECT * FROM Categories"
+stock <- sqlQuery(channel, query)
+stock
+query <- "SELECT ProductID,OnHand FROM Inventory"
+quantities <- sqlQuery(channel, query)
+head(quantities,10)
+
+query <- "SELECT Products.ProductName, Inventory.OnHand FROM
+Inventory INNER JOIN Products ON Inventory.ProductID = Products.ID "
+quantities <- sqlQuery(channel, query)
+head(quantities,10)
+
+query <- "SELECT Products.ProductName, Inventory.OnHand FROM
+Inventory INNER JOIN Products ON Inventory.ProductID = Products.ID
+WHERE Inventory.OnHand > 150 "
+
+supply <- sqlQuery(channel, query)
+head(supply,10)
+
+name <- "NWTDFN-14"
+query <- paste("SELECT ProductName FROM Products WHERE
+ProductCode='",name,"'",sep="")
+code <- sqlQuery(channel, query)
+head(code,10)
+
+query
+
+```
+
+

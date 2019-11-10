@@ -1,0 +1,840 @@
+---
+title: "Nathan Wemmer"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+# Chapter 8
+# Section 8.1
+# Section 8.1.1
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("das.txt",header=T)
+names(data)
+
+attach(data)
+
+par(mfrow=c(2,2))
+plot(y)
+boxplot(y)
+hist(y,main="")
+y2 <- y
+y2[52] <- 21.75
+plot(y2)
+
+summary(y)
+fivenum(y)
+
+x <- sort(y)
+n <- length(y)
+d <- c(1, 0.5 * floor(0.5 * (n + 3)), 0.5 * (n + 1), n + 1 - 0.5 *
+         floor(0.5 * (n + 3)), n)
+0.5 * (x[floor(d)] + x[ceiling(d)])
+
+```
+# Section 8.1.2
+```{r}
+par(mfrow=c(1,1))
+qqnorm(y)
+qqline(y,lty=2)
+
+
+```
+# Section 8.1.3
+```{r}
+x <- exp(rnorm(30))
+shapiro.test(x)
+
+```
+# Section 8.1.4
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+light <- read.table("light.txt",header=T)
+attach(light)
+hist(speed,main="",col="green")
+summary(speed)
+wilcox.test(speed,mu=990)
+
+
+```
+# Section 8.2
+```{r}
+a <- numeric(10000)
+for(i in 1:10000) a[i] <- mean(sample(speed,replace=T))
+hist(a,main="",col="blue")
+
+```
+# Section 8.3
+# Section 8.3.1
+```{r}
+windows(7,4)
+par(mfrow=c(1,2))
+x <- seq(0,4,0.01)
+plot(x,dgamma(x,2,2),type="l",ylab="f(x)",xlab="x",col="red")
+
+text(2.7,0.5,"positive skew")
+plot(4-x,dgamma(x,2,2),type="l",ylab="f(x)",xlab="x",col="red")
+text(1.3,0.5,"negative skew")
+
+skew <- function(x){
+  m3 <- sum((x-mean(x))^3)/length(x)
+  s3 <- sqrt(var(x))^3
+  m3/s3
+}
+
+# data <- read.table("c:\\temp\\skewdata.txt",header=T)
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("skewdata.txt",header=T)
+attach(data)
+names(data)
+
+hist(values)
+skew(values)
+skew(values)/sqrt(6/length(values))
+1-pt(2.949,28)
+skew(sqrt(values))/sqrt(6/length(values))
+skew(log(values))/sqrt(6/length(values))
+
+```
+# Section 8.3.2
+```{r}
+plot(-200:200,dcauchy(-200:200,0,10),type="l",ylab="f(x)",xlab="",yaxt="n",
+     xaxt="n",main="leptokurtosis",col="red")
+xv <- seq(-2,2,0.01)
+plot(xv,exp(-abs(xv)^6),type="l",ylab="f(x)",xlab="",yaxt="n",
+     xaxt="n",main="platykurtosis",col="red")
+
+kurtosis <- function(x) {
+  m4 <- sum((x-mean(x))^4)/length(x)
+  s4 <- var(x)^2
+  m4/s4 - 3 }
+
+kurtosis(values)
+kurtosis(values)/sqrt(24/length(values))
+
+
+```
+# Section 8.4
+# Section 8.4.1
+```{r}
+qf(0.975,9,9)
+
+#f.test.data <- read.table("c:\\temp\\f.test.data.txt",header = T)
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+f.test.data <- read.table("f.test.data.txt",header = T)
+
+attach(f.test.data)
+names(f.test.data)
+
+var(gardenB)
+var(gardenC)
+
+F.ratio <- var(gardenC)/var(gardenB)
+F.ratio
+
+2*(1-pf(F.ratio,9,9))
+
+var.test(gardenB,gardenC)
+
+#refs <- read.table("c:\\temp\\refuge.txt",header=T)
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+refs <- read.table("refuge.txt",header=T)
+
+attach(refs)
+names(refs)
+tapply(B,T,var)
+
+which(T==9)
+
+bartlett.test(B[-31],T[-31])
+
+fligner.test(B[-31],T[-31])
+
+model <- lm(B~T)
+plot(model)
+
+#ozone <- read.table("c:\\temp\\gardens.txt",header=T)
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+ozone <- read.table("gardens.txt",header=T)
+attach(ozone)
+names(ozone)
+
+y <- c(gardenA,gardenB,gardenC)
+garden <- factor(rep(c("A","B","C"),c(10,10,10)))
+var.test(gardenB,gardenC)
+fligner.test(y~garden)
+
+
+```
+# Section 8.4.2
+# Section 8.4.3
+```{r}
+qt(0.975,18)
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+#t.test.data <- read.table("c:\\temp\\t.test.data.txt",header=T)
+t.test.data <- read.table("t.test.data.txt",header=T)
+attach(t.test.data)
+par(mfrow=c(1,1))
+names(t.test.data)
+
+ozone <- c(gardenA,gardenB)
+label <- factor(c(rep("A",10),rep("B",10)))
+boxplot(ozone~label,notch=T,xlab="Garden",ylab="Ozone")
+
+s2A <- var(gardenA)
+s2B <- var(gardenB)
+
+(mean(gardenA)-mean(gardenB))/sqrt(s2A/10+s2B/10)
+2*pt(-3.872983,18)
+t.test(gardenA,gardenB)
+
+# 8.4.4 Wilcoxon rank-sum test
+ozone <- c(gardenA,gardenB)
+ozone
+label <- c(rep("A",10),rep("B",10))
+label
+combined.ranks <- rank(ozone)
+combined.ranks
+tapply(combined.ranks,label,sum)
+wilcox.test(gardenA,gardenB)
+
+```
+# Section 8.5
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+streams <- read.table("streams.txt",header=T)
+
+attach(streams)
+names(streams)
+
+t.test(down,up)
+t.test(down,up,paired=TRUE)
+difference <- up - down
+t.test(difference)
+
+```
+
+# Section 8.6
+```{r}
+sign.test <- function(x, y)
+{
+  if(length(x) != length(y)) stop("The two variables must be the same length")
+  d <- x - y
+  binom.test(sum(d > 0), length(d))
+}
+
+sign.test(gardenA,gardenB)
+
+
+```
+# Section 8.7
+```{r}
+prop.test(c(4,196),c(40,3270))
+```
+# Section 8.8
+# Section 8.8.1
+```{r}
+qchisq(0.95,1)
+count <- matrix(c(38,14,11,51),nrow=2)
+count
+
+chisq.test(count)
+chisq.test(count,correct=F)
+
+chisq.test(count,correct=F)$expected
+
+```
+# Section 8.8.2
+# Section 8.8.3
+```{r}
+chisq.test(c(10,3,2,6))
+chisq.test(c(10,3,2,6),p=c(0.2,0.2,0.3,0.3))
+```
+# Section 8.8.4
+```{r}
+die <- ceiling(runif(100,0,6))
+table(die)
+chisq.test(table(die))
+```
+
+# Section 8.8.5
+```{r}
+factorial(8)*factorial(12)*factorial(10)*factorial(10)/
+  (factorial(6)*factorial(2)*factorial(4)*factorial(8)*factorial(20))
+factorial(8)*factorial(12)*factorial(10)*factorial(10)/
+  (factorial(7)*factorial(3)*factorial(1)*factorial(9)*factorial(20))
+factorial(8)*factorial(12)*factorial(10)*factorial(10)/
+  (factorial(8)*factorial(2)*factorial(0)*factorial(10)*factorial(20))
+
+0.07501786 + 0.009526078 + 0.000352279
+2*(0.07501786 + 0.009526078 + 0.000352279)
+
+
+x <- as.matrix(c(6,4,2,8))
+dim(x) <- c(2,2)
+x
+
+fisher.test(x)
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+#table <- read.table("c:\\temp\\fisher.txt",header=TRUE)
+table <- read.table("fisher.txt",header=TRUE)
+
+head(table)
+attach(table)
+fisher.test(tree,nests)
+```
+# Section 8.9
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("twosample.txt",header=T)
+attach(data)
+plot(xx,yy,pch=21,col="red",bg="orange")
+
+var(xx)
+var(yy)
+var(xx,yy)
+var(xx,yy)/sqrt(var(xx)*var(yy))
+cor(xx,yy)
+```
+# Section 8.9.1
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+pollute <- read.table("Pollute.txt",header=T)
+attach(pollute)
+cor(pollute)
+cor(Pollution,Wet.days)
+```
+# Section 8.9.2
+# Section 8.9.3 skip
+# Section 8.9.4
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+productivity <- read.table("productivity.txt",header=T)
+attach(productivity)
+head(productivity)
+plot(x,y,pch=21,col="blue",bg="green",
+     xlab="Productivity",ylab="Mammal species")
+cor.test(x,y)
+
+```
+
+# Section 8.10 skip
+# Section 8.11
+
+```{r}
+power.t.test(delta=2,sd=3.5,power=0.8)
+power.t.test(n=15,sd=3.5,power=0.8)
+
+```
+# Section 8.12
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("skewdata.txt",header=T)
+attach(data)
+names(data)
+
+ms <- numeric(10000)
+for (i in 1:10000){
+  ms[i] <- mean(sample(values, length(values),replace=TRUE, prob=NULL)) }
+
+quantile(ms,c(0.025,0.975))
+
+mean(values)-quantile(ms,c(0.025,0.975))
+
+1.96*sqrt(var(values)/length(values))
+
+install.packages("boot")
+library(boot)
+
+mymean <- function(values,i) mean(values[i])
+
+myboot <- boot(values,mymean,R=10000)
+myboot
+
+mean(values)
+mean(myboot$t)-mean(values)
+sqrt(var(myboot$t))
+
+windows(7,4)
+par(mfrow=c(2,1))
+hist(ms)
+hist(myboot$t)
+
+mean(values)-quantile(myboot$t,c(0.025,0.975))
+boot.ci(myboot)
+quantile(myboot$t,c(0.025,0.975))
+```
+# END OF CHAPTER 8
+# Chapter 9
+# Section 9.1
+# Section 9.2
+# Section 9.3
+# Section 9.4
+# Section 9.5
+# Section 9.6
+# Section 9.6.2
+```{r}
+xnames <- paste("x", 1:25, sep="")
+(model.formula <- as.formula(paste("y~", paste(xnames, collapse= "+"))))
+```
+# Section 9.7
+```{r}
+A <- rep(1:2,each=12)
+B <- rep(1:4,each=3,length=24)
+C <- rep(1:3,length=24)
+
+a <- factor(A)
+b <- factor(A):factor(B)
+c <- factor(A):factor(B):factor(C)
+```
+# Section 9.8
+# Section 9.9
+# Section 9.10
+```{r}
+windows(7,4)
+par(mfrow=c(1,2))
+x <- seq(0,10,0.1)
+plot(x,1+x-x^2/15,type="l",col="red")
+plot(x,3+0.1*exp(x),type="l",col="red")
+```
+
+# Section 9.11
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.delim("timber.txt")
+attach(data)
+names(data)
+
+library(MASS)
+
+windows(7,7)
+boxcox(volume~log(girth)+log(height))
+boxcox(volume~log(girth)+log(height),lambda=seq(-0.5,0.5,0.01))
+boxcox(volume~girth+height)
+boxcox(volume~girth+height,lambda=seq(0.1,0.6,0.01))
+
+```
+# Section 9.12
+# Section 9.13
+# Section 9.13.2
+```{r}
+mcheck <- function (obj, ...){
+  rs <- obj$resid
+  fv <- obj$fitted
+  windows(7,4)
+  par(mfrow=c(1,2))
+  plot(fv,rs,xlab="Fitted values",ylab="Residuals",pch=16,col="red")
+  abline(h=0, lty=2)
+  qqnorm(rs,xlab="Normal scores",ylab="Ordered residuals",main="",pch=16)
+  qqline(rs,lty=2,col="green")
+  par(mfrow=c(1,1))
+  invisible(NULL) }
+
+# Normal errors
+
+x <- 0:30
+e <- rnorm(31,mean=0,sd=5)
+yn <- 10+x+e
+mn <- lm(yn~x)
+mcheck(mn)
+
+
+# Uniform errors
+eu <- 20*(runif(31)-0.5)
+yu <- 10+x+eu
+mu <- lm(yu~x)
+mcheck(mu)
+
+
+# Negative binomial errors
+enb <- rnbinom(31,2,.3)
+ynb <- 10+x+enb
+mnb <- lm(ynb~x)
+mcheck(mnb)
+
+
+# Gamma errors and increasing variance
+
+eg <- rgamma(31,1,1/x)
+yg <- 10+x+eg
+mg <- lm(yg~x)
+mcheck(mg)
+```
+# Section 9.14
+```{r}
+x <- c(2,3,3,3,4)
+y <- c(2,3,2,1,2)
+
+windows(7,4)
+par(mfrow=c(1,2))
+plot(x,y,xlim=c(0,8),ylim=c(0,8))
+
+x1 <- c(x,7)
+y1 <- c(y,6)
+plot(x1,y1,xlim=c(0,8),ylim=c(0,8))
+abline(lm(y1~x1),col="blue")
+
+reg <- lm(y1~x1)
+summary(reg)
+
+influence.measures(reg)
+influence.measures(reg)$is.inf
+lm.influence(reg)
+
+summary.aov(lm(y1[-6]~x1[-6]))
+
+```
+# Section 9.15
+# Section 9.16
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("ipomopsis.txt",header=T)
+attach(data)
+names(data)
+
+```
+# Section 9.16.1
+```{r}
+model <- lm(Fruit[Grazing=="Grazed"]~Root[Grazing=="Grazed"])
+model <- lm(Fruit~Root,subset=(Grazing=="Grazed"))
+```
+
+# section 9.16.2
+```{r}
+model <- lm(Fruit~Grazing,weights=Root)
+summary(model)
+
+model <- lm(Fruit~Grazing)
+summary(model)
+```
+# Section 9.16.3
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("ipomopsis.txt",header=T)
+attach(data)
+names(data)
+
+# 9.16.1 Subsets
+model <- lm(Fruit[Grazing=="Grazed"]~Root[Grazing=="Grazed"])
+model <- lm(Fruit~Root,subset=(Grazing=="Grazed"))
+
+# 9.16.2 Weights
+model <- lm(Fruit~Grazing,weights=Root)
+summary(model)
+
+model <- lm(Fruit~Grazing)
+summary(model)
+Root[37] <- NA
+model <- lm(Fruit~Grazing*Root)
+model <- lm(Fruit~Grazing*Root,na.action=na.fail)
+```
+# Section 9.17
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("regression.txt",header=T)
+attach(data)
+names(data)
+model <- lm(growth~tannin)
+n <- length(growth)
+sse <- sum((growth-fitted(model))^2)
+s2 <- sse/(n-2)
+s <- sqrt(s2)
+
+-(n/2)*log(2*pi)-n*log(s)-sse/(2*s2)
+logLik(model)
+-2 * -16.37995 + 6
+AIC(model)
+```
+
+# Section 9.17.1
+```{r}
+model.1 <- lm(Fruit~Grazing*Root)
+model.2 <- lm(Fruit~Grazing+Root)
+AIC(model.1, model.2)
+-2*logLik(model.1)+2*(4+1)
+-2*logLik(model.2)+2*(3+1)
+#models <- list (model1, model2, model3, model4, model5, model6)
+models <- list (model.1, model.2)
+aic <- unlist(lapply(models, AIC))
+aic
+```
+# Section 9.18
+```{r}
+x <- c(2,3,3,3,4,7)
+leverage <- function(x){1/length(x)+(x-mean(x))^2/sum((x-mean(x))^2)}
+plot(leverage(x),type="h",ylim=c(0,1),col="blue")
+abline(h=4/6,lty=2,col="green")
+```
+# section 9.19
+# Section 9.20
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+Decay <- read.table("Decay.txt",header=T)
+attach(Decay)
+names(Decay)
+model <- lm(amount~time)
+par(mfrow=c(2,2))
+plot(model)
+```
+# Section 9.21
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("regression.txt",header=T)
+attach(data)
+names(data)
+
+model <- lm(growth~tannin)
+summary(model)
+```
+# Section 9.21.1
+```{r}
+coef(model)
+fitted(model)
+resid(model)
+vcov(model)
+```
+
+# Section 9.21.2
+```{r}
+summary.aov(model)
+summary.aov(model)[[1]][1]
+summary.aov(model)[[1]][2]
+summary.aov(model)[[1]][3]
+summary.aov(model)[[1]][4]
+summary.aov(model)[[1]][5]
+as.numeric(unlist(summary.aov(model)[[1]][4]))[1]
+summary(model)
+summary(model)[[1]]
+summary(model)[[2]]
+summary(model)[[3]]
+summary(model)[[4]]
+summary(model)[[4]] [1]
+summary(model)[[4]] [2]
+summary(model)[[4]] [3]
+summary(model)[[4]] [4]
+summary(model)[[4]] [8]
+summary(model)[[5]]
+summary(model)[[6]]
+summary(model)[[7]]
+summary(model)[[8]]
+summary(model)[[9]]
+summary(model)[[10]]
+summary(model)[[11]]
+```
+# Section 9.21.3
+```{r}
+model$coef
+model$df
+```
+
+# Section 9.21.4
+```{r}
+x <- 0:100
+y <- 17+0.2*x+3*rnorm(101)
+model0 <- lm(y~1)
+model1 <- lm(y~x)
+model2 <- lm(y~x+I(x^2))
+models <- list(model0,model1,model2)
+lapply(models,coef)
+
+as.vector(unlist(lapply(models,coef)))[c(1,2,4)]
+lapply(models,AIC)
+```
+# Section 9.22
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+comp <- read.table("competition.txt",header=T)
+attach(comp)
+names(comp)
+
+levels(clipping)
+
+# The analysis of variance model is fitted like this:
+model <- lm(biomass~clipping)
+summary.aov(model)
+summary.lm(model)
+comp[1,]
+
+
+means <- tapply(biomass,clipping,mean)
+means
+means[2]-means[1]
+means[3]-means[1]
+means[4]-means[1]
+means[5]-means[1]
+sqrt(4961/6)
+sqrt(2*4961/6)
+
+
+```
+
+# Section 9.23
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+comp <- read.table("competition.txt",header=T)
+attach(comp)
+names(comp)
+
+model1 <- aov(biomass~clipping)
+summary(model1)
+summary.lm(model1)
+levels(clipping)
+
+```
+# Section 9.23.3
+```{r}
+contrasts(clipping) <-
+  cbind(c(4,-1,-1,-1,-1),c(0,1,1,-1,-1),c(0,0,0,1,-1),c(0,1,-1,0,0))
+
+clipping
+
+model2 <- aov(biomass~clipping)
+summary.lm(model2)
+
+mean(biomass)
+tapply(biomass,clipping,mean)
+
+c1 <- factor(1+(clipping!="control"))
+tapply(biomass,c1,mean)
+mean(biomass) - tapply(biomass,c1,mean)[2]
+
+c2 <- factor(2*(clipping=="n25")+2*(clipping=="n50")+
+               (clipping=="r10")+(clipping=="r5"))
+(tapply(biomass,c2,mean)[3]- tapply(biomass,c2,mean)[2])/2
+(610.666666-610.5)/2
+(553.3333-569.3333)/2
+sqrt(4961/(5*4*6))
+sqrt(2*(4961/12))/2
+sqrt(2*(4961/6))/2
+```
+
+# Section 9.24
+```{r}
+contrasts(clipping) <- NULL
+options(contrasts=c("contr.treatment","contr.poly"))
+
+model3 <- aov(biomass~clipping)
+summary.lm(model3)
+clip2 <- clipping
+levels(clip2)
+levels(clip2)[4:5] <- "root"
+
+model4 <- aov(biomass~clip2)
+anova(model3,model4)
+summary.lm(model4)
+clip3 <- clip2
+levels(clip3)[2:3] <- "shoot"
+levels(clip3)
+
+model5 <- aov(biomass~clip3)
+anova(model4,model5)
+clip4 <- clip3
+levels(clip4)[2:3] <- "pruned"
+levels(clip4)
+
+model6 <- aov(biomass~clip4)
+anova(model5,model6)
+summary.lm(model6)
+tapply(biomass,clip4,mean)
+
+model7 <- aov(biomass~1)
+anova(model6,model7)
+```
+
+# Section 9.25
+# Section 9.25.1
+```{r}
+options(contrasts=c("contr.treatment","contr.poly"))
+contrasts(clipping)
+output.treatment <- lm(biomass~clipping)
+summary(output.treatment)
+
+```
+
+# Section 9.25.2
+```{r}
+options(contrasts=c("contr.helmert","contr.poly"))
+contrasts(clipping)
+output.helmert <- lm(biomass~clipping)
+summary(output.helmert)
+(465.16667+553.33333)/2-465.166667
+(465.16667+553.33333+569.333333)/3-(465.166667+553.3333)/2
+(465.16667+553.33333+569.333333+610.66667)/4-(553.3333+465.166667+569.3333)/3
+mean(biomass)-(465.16667+553.33333+569.333333+610.66667)/4
+sqrt(4961/30)
+sqrt(4961/(2*6))
+sqrt(4961/(3*2*6))
+sqrt(4961/(4*3*6))
+sqrt(4961/(5*4*6))
+```
+# Section 9.25.3
+```{r}
+options(contrasts=c("contr.sum","contr.poly"))
+output.sum <- lm(biomass~clipping)
+summary(output.sum)
+
+tapply(biomass,clipping,mean) - 561.8
+sqrt(4961/30+4961/10)
+```
+# Section 9.26
+# Section 9.27
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+data <- read.table("poly.txt",header=T)
+
+attach(data)
+names(data)
+tapply(response,treatment,mean)
+summary.aov(model)
+is.factor(treatment)
+is.ordered(treatment)
+
+treatment <- ordered(treatment,levels=c("none","low","medium","high"))
+levels(treatment)
+
+model2 <- lm(response~treatment)
+summary.aov(model2)
+
+summary.lm(model2)
+tapply(response,treatment,mean)
+
+yv <- as.vector(tapply(response,treatment,mean))
+x <- 1:4
+model <- lm(yv~x+I(x^2)+I(x^3))
+summary(model)
+
+x <- 1:4
+x2 <- x^2
+x3 <- x^3
+cor(cbind(x,x2,x3))
+
+t(contrasts(treatment))
+4.8125 - 0.6708204*1.733 - 0.5*2.6250 + 0.2236068*0.7267
+4.8125 - 0.2236068*1.733+0.5*2.6250 - 0.6708204*0.7267
+4.8125 + 0.2236068*1.733 + 0.5*2.6250 + 0.6708204*0.7267
+4.8125 + 0.6708204*1.733 - 0.5*2.6250 - 0.2236068*0.7267
+
+y <- as.vector(tapply(response,treatment,mean))
+model <- lm(y~poly(x,3))
+summary(model)
+
+xv <- seq(1,4,0.1)
+yv <- predict(model,list(x=xv))
+
+(bar.x <- barplot(y))
+
+barplot(y,names=levels(treatment))
+xs <- -0.5 + 1.2 * xv
+lines(xs,yv,col="red")
+
+```
+END OF CODE

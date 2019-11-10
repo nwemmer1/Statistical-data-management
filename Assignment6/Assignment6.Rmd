@@ -1,0 +1,738 @@
+---
+title: "Nathan Wemmer"
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+# Section 7.3
+```{r}
+
+curve(pnorm(x),-3,3)
+arrows(-1,0,-1,pnorm(-1),col="red")
+arrows(-1,pnorm(-1),-3,pnorm(-1),col="green")
+
+
+pnorm(-1)
+curve(dnorm(x),-3,3)
+
+```
+# section 7.3.1
+```{r}
+par(mfrow=c(2,2))
+x <- seq(-3,3,0.01)
+y <- exp(-abs(x))
+plot(x,y,type="l",main= "x")
+y <- exp(-abs(x)^2)
+plot(x,y,type="l",main= "x^2")
+y <- exp(-abs(x)^3)
+plot(x,y,type="l",main= "x^3")
+y <- exp(-abs(x)^8)
+plot(x,y,type="l",main= "x^8")
+
+pnorm(-1.25)
+pnorm(1.875)
+1-pnorm(1.875)
+pnorm(1.25)-pnorm(-0.625)
+
+x <- seq(-3,3,0.01)
+z <- seq(-3,-1.25,0.01)
+p <- dnorm(z)
+z <- c(z,-1.25,-3)
+p <- c(p,min(p),min(p))
+plot(x,dnorm(x),type="l",xaxt="n",ylab="probability density",xlab="height")
+axis(1,at=-3:3,labels=c("146","154","162","170","178","186","192"))
+polygon(z,p,col="red")
+z <- seq(1.875,3,0.01)
+p <- dnorm(z)
+z <- c(z,3,1.875)
+p <- c(p,min(p),min(p))
+plot(x,dnorm(x),type="l",xaxt="n",ylab="probability density",xlab="height")
+axis(1,at=-3:3,labels=c("146","154","162","170","178","186","192"))
+polygon(z,p,col="red")
+z <- seq(-0.635,1.25,0.01)
+p <- dnorm(z)
+z <- c(z,1.25,-0.635)
+p <- c(p,0,0)
+plot(x,dnorm(x),type="l",xaxt="n",ylab="probability density",xlab="height")
+axis(1,at=-3:3,labels=c("146","154","162","170","178","186","192"))
+polygon(z,p,col="red")
+
+
+
+
+```
+
+# Section 7.3.2
+```{r}
+
+par(mfrow=c(1,1))
+hist(runif(10000)*10,main="")
+
+means <- numeric(10000)
+for (i in 1:10000){
+  means[i] <- mean(runif(5)*10)
+}
+hist(means,ylim=c(0,1600),main="")
+
+mean(means)
+sd(means)
+xv <- seq(0,10,0.1)
+
+yv <- dnorm(xv,mean=4.998581,sd=1.28996)*5000
+lines(xv,yv)
+
+par(mfrow=c(2,2))
+hist(sample(1:6,replace=T,10000),breaks=0.5:6.5,main="",xlab="one die")
+
+a <- sample(1:6,replace=T,10000)
+b <- sample(1:6,replace=T,10000)
+hist(a+b,breaks=1.5:12.5,main="", xlab="two dice")
+
+c <- sample(1:6,replace=T,10000)
+hist(a+b+c,breaks=2.5:18.5,main="", xlab="three dice")
+
+d <- sample(1:6,replace=T,10000)
+e <- sample(1:6,replace=T,10000)
+hist(a+b+c+d+e,breaks=4.5:30.5,main="", xlab="five dice")
+
+mean(a+b+c+d+e)
+sd(a+b+c+d+e)
+lines(seq(1,30,0.1),dnorm(seq(1,30,0.1),17.5937,3.837668)*10000)
+```
+# Section 7.3.3
+```{r}
+par(mfrow=c(2,2))
+curve(dnorm,-3,3,xlab="z",ylab="Probability density",main="Density")
+curve(pnorm,-3,3,xlab="z",ylab="Probability",main="Probability")
+curve(qnorm,0,1,xlab="p",ylab="Quantile (z)",main="Quantiles")
+y <- rnorm(1000)
+hist(y,xlab="z",ylab="frequency",main="Random numbers")
+
+```
+# Section 7.3.4
+```{r}
+yvals <- rnorm(100,24,4)
+mean(yvals)
+
+sd(yvals)
+
+ydevs <- rnorm(100,0,1)
+ydevs <- (ydevs-mean(ydevs))/sd(ydevs)
+mean(ydevs)
+sd(ydevs)
+
+
+yvals <- 24 + ydevs*4
+mean(yvals)
+sd(yvals)
+```
+
+# Section 7.3.5
+```{r}
+setwd("C:/Users/Nathan/Desktop/school/statistical data management/therbook")
+par(mfrow=c(1,1))
+fishes <- read.table("fishes.txt",header=T)
+attach(fishes)
+names(fishes)
+
+mean(mass)
+
+max(mass)
+hist(mass,breaks=-0.5:16.5,col="green",main="")
+lines(seq(0,16,0.1),length(mass)*dnorm(seq(0,16,0.1),mean(mass),sqrt(var(mass))))
+
+```
+
+# Section 7.3.6
+```{r}
+1-pchisq(14.3,9)
+qchisq(0.95,9)
+1-pf(2.85,8,12)
+qt(0.975,10)
+
+windows(7,4)
+par(mfrow=c(1,2))
+x <- seq(0,30,.25)
+plot(x,pchisq(x,3,7.25),type="l",ylab="p(x)",xlab="x")
+plot(x,pchisq(x,5,10),type="l",ylab="p(x)",xlab="x")
+
+8*10.2/qchisq(.975,8)
+8*10.2/qchisq(.025,8)
+```
+# Section 7.3.8
+```{r}
+qf(.95,2,18)
+
+x <- seq(0.05,4,0.05)
+plot(x,df(x,2,18),type="l",ylab="f(x)",xlab="x")
+plot(x,df(x,6,18),type="l",ylab="f(x)",xlab="x")
+
+windows(7,7)
+par(mfrow=c(1,1))
+df <- seq(1,30,.1)
+plot(df,qf(.95,df,30),type="l",ylab="Critical F")
+lines(df,qf(.95,df,10),lty=2)
+
+x <- seq(0.01,3,0.01)
+plot(x,df(x,1,10),type="l",ylim=c(0,1),ylab="f(x)")
+lines(x,df(x,2,10),lty=6,col="red")
+lines(x,df(x,5,10),lty=2,col="green")
+lines(x,df(x,30,10),lty=3,col="blue")
+legend(2,0.9,c("1","2","5","30"),col=(1:4),lty=c(1,6,2,3),
+       title="numerator d.f.")
+```
+# Section 7.3.9
+```{r}
+curve( (1+x^12)^(-0.5), -3, 3, ylab="t(x)",col="red")
+
+plot(1:30,qt(0.975,1:30), ylim=c(0,12),type="l",
+     ylab="Students t value",xlab="d.f.",col="red")
+abline(h=2,lty=2,col="green")
+
+xvs <- seq(-4,4,0.01)
+plot(xvs,dnorm(xvs),type="l",lty=2,
+     ylab="Probability density",xlab="Deviates")
+
+lines(xvs,dt(xvs,df=5),col="red")
+
+qt(0.975,5)
+
+```
+# Section 7.3.10
+```{r}
+x <- seq(0.01,4,.01)
+par(mfrow=c(2,2))
+y <- dgamma(x,.5,.5)
+plot(x,y,type="l",col="red",main="alpha = 0.5")
+y <- dgamma(x,.8,.8)
+plot(x,y,type="l",col="red", main="alpha = 0.8")
+y <- dgamma(x,2,2)
+plot(x,y,type="l",col="red", main="alpha = 2")
+y <- dgamma(x,10,10)
+plot(x,y,type="l",col="red", main="alpha = 10")
+
+qgamma(0.95,2/3,4/3)
+#fishes <- read.table("c:\\temp\\fishes.txt",header=T)
+fishes <- read.table("fishes.txt",header=T)
+attach(fishes)
+names(fishes)
+
+rate <- mean(mass)/var(mass)
+shape <- rate*mean(mass)
+rate
+
+shape
+
+max(mass)
+par(mfrow=c(1,1))
+hist(mass,breaks=-0.5:16.5,col="green",main="")
+lines(seq(0.01,15,0.01),length(mass)*dgamma(seq(0.01,15,0.01),shape,rate))
+
+```
+# Section 7.3.11
+```{r}
+rexp(15,0.1)
+```
+
+# Section 7.3.12
+```{r}
+par(mfrow=c(2,2))
+x <- seq(0,1,0.01)
+fx <- dbeta(x,2,3)
+plot(x,fx,type="l",main="a=2 b=3",col="red")
+fx <- dbeta(x,0.5,2)
+plot(x,fx,type="l",main="a=0.5 b=2",col="red")
+fx <- dbeta(x,2,0.5)
+plot(x,fx,type="l",main="a=2 b=0.5",col="red")
+fx <- dbeta(x,0.5,0.5)
+plot(x,fx,type="l",main="a=0.5 b=0.5",col="red")
+
+rbeta(10,2,3)
+
+```
+# Section 7.3.13
+```{r}
+
+windows(7,4)
+par(mfrow=c(1,2))
+plot(-200:200,dcauchy(-200:200,0,10),type="l",ylab="p(x)",xlab="x",
+     col="red")
+plot(-200:200,dcauchy(-200:200,0,50),type="l",ylab="p(x)",xlab="x",
+     col="red")
+```
+# Section 7.3.14
+```{r}
+
+windows(7,7)
+plot(seq(0,10,0.05),dlnorm(seq(0,10,0.05)),
+     type="l",xlab="x",ylab="LogNormal f(x)",col="red")
+
+```
+# Section 7.3.15
+```{r}
+windows(7,4)
+par(mfrow=c(1,2))
+plot(seq(-5,5,0.02),dlogis(seq(-5,5,.02)),
+     type="l",main="Logistic",col="red",xlab="x",ylab="p(x)")
+plot(seq(-5,5,0.02),dnorm(seq(-5,5,.02)),
+     type="l",main="Normal",col="red",xlab="x",ylab="p(x)")
+
+
+```
+# Section 7.3.16
+```{r}
+windows(7,4)
+par(mfrow=c(1,2))
+x <- seq(0.1,1,0.01)
+y <- -1.4+2.1*(exp(-1.59*log(x)-1.53)/(1+exp(-1.59*log(x)-1.53)))
+plot(log(x),y,type="l", main="c = -1.59", col="red")
+
+y <- 0.1+2.1*(exp(1.59*log(x)-1.53)/(1+exp(1.59*log(x)-1.53)))
+plot(log(x),y,type="l",main="c = 1.59",col="red")
+
+```
+# Section 7.3.17
+```{r}
+windows(7,7)
+a <- 3
+l <- 1
+t <- seq(0,1.8,.05)
+ft <- a*l*t^(a-1)*exp(-l*t^a)
+plot(t,ft,type="l",col="blue",ylab="f(t) ")
+a <- 1
+ft <- a*l*t^(a-1)*exp(-l*t^a)
+lines(t,ft,type="l",col="red")
+a <- 2
+ft <- a*l*t^(a-1)*exp(-l*t^a)
+lines(t,ft,type="l",col="green")
+legend(1.4,1.1,c("1","2","3"),title="alpha",lty=c(1,1,1),col=c(2,3,4))
+
+# 7.3.18 Multivariate normal distribution
+```
+# Section 7.3.18
+```{r}
+
+library(MASS)
+xy <- mvrnorm(1000,mu=c(50,60),matrix(c(4,3.7,3.7,9),2))
+
+var(xy)
+x <- xy[,1]
+y <- xy[,2]
+plot(x,y,pch=16,ylab="y",xlab="x",col="blue")
+var(x)
+var(y)
+var(x+y)
+var(x)+var(y)
+var(x-y)
+cor(x,y)*sqrt(var(x)*var(y))
+
+```
+# Section 7.3.19
+```{r}
+
+x <- ceiling(runif(10000)*6)
+table(x)
+hist(x,breaks=0.5:6.5,main="")
+
+x <- runif(1000000)
+y <- runif(1000000)
+plot(x,y,pch=".",col="blue")
+
+table(cut(x,6),cut(y,6))
+range(table(cut(x,6),cut(y,6)))
+```
+# Section 7.3.20
+```{r}
+
+fishes <- read.table("fishes.txt",header=T)
+attach(fishes)
+names(fishes)
+
+plot(ecdf(mass))
+
+```
+
+# Section 7.4
+# Section 7.4.1
+# Section 7.4.2
+```{r}
+factorial(49)/(factorial(6)*factorial(49-6))
+choose(49,6)
+
+p <- 0.1
+n <- 4
+x <- 0:n
+px <- choose(n,x)*p^x*(1-p)^(n-x)
+barplot(px,names=x,xlab="outcome",ylab="probability",col="green")
+
+barplot(pbinom(0:4,4,0.1),names=0:4,xlab="parasitized fish",
+        ylab="probability",col="red")
+
+qbinom(.025,4,0.1)
+qbinom(.975,4,0.1)
+rbinom(10,4,0.1)
+
+```
+
+# Section 7.4.3
+```{r}
+fx <- dgeom(0:20,0.2)
+barplot(fx,names=0:20,xlab="outcome",ylab="probability",col="cyan")
+table(rgeom(100,0.1))
+
+```
+# Section 7.4.4
+```{r}
+ph <- dhyper(0:5,6,14,5)
+barplot(ph,names=(0:5),col="red",xlab="outcome",ylab="probability")
+rhyper(20,6,14,5)
+```
+
+# Section 7.4.5
+```{r}
+multi <- function(a,b,c) {
+  factorial(a+b+c)/(factorial(a)*factorial(b)*factorial(c))*0.5^a*0.25^b*0.25^c}
+
+barplot(sapply(0:20,function (i) multi(i,20-i,4)),names=0:20,cex.names=0.7,
+        xlab="outcome",ylab="probability",col="yellow")
+
+```
+# Section 7.4.6
+```{r}
+
+count <- rpois(600,0.9)
+table(count)
+
+hist(count,breaks = - 0.5:6.5,main="")
+```
+# Section 7.4.7
+```{r}
+negbin <- function(x,u,k)
+  (1+u/k)^(-k)*(u/(u+k))^x*gamma(k+x)/(factorial(x)*gamma(k))
+
+xf <- sapply(0:10, function(i) negbin(i,0.8,0.2))
+barplot(xf,names=0:10,xlab="count",ylab="probability density",col="green")
+
+plot(5:100,dnbinom(5:100,5,0.1),type="s",xlab="x",ylab="f(x)")
+count <- rnbinom(100,1,0.6)
+table(count)
+mean(count)
+var(count)
+
+x <- 0:12
+freq <- c(131,55,21,14,6,6,2,0,0,0,0,2,1)
+barplot(freq,names=x,ylab="frequency",xlab="spores",col="purple")
+
+y <- rep(x,freq)
+mean(y)
+var(y)
+
+mean(y)^2/(var(y)-mean(y))
+
+kfit <- function(x) {
+  lhs <- numeric()
+  rhs <- numeric()
+  y <- 0:(length(x) - 1)
+  j <- 0:(length(x)-2)
+  m <- sum(x * y)/(sum(x))
+  s2 <- (sum(x * y^2) - sum(x * y)^2/sum(x))/(sum(x)- 1)
+  k1 <- m^2/(s2 - m)
+  a <- numeric(length(x)-1)
+  for(i in 1:(length(x) - 1)) a[i] <- sum(x [- c(1:i)])
+  i <- 0
+  for (k in seq(k1/1.2,2*k1,0.001)) {
+    i <- i+1
+    lhs[i] <- sum(x) * log(1 + m/k)
+    rhs[i] <- sum(a/(k + j))
+  }
+  k <- seq(k1/1.2,2*k1,0.001)
+  plot(k, abs(lhs-rhs),xlab="k",ylab="Difference",type="l",col="red")
+  d <- min(abs(lhs-rhs))
+  sdd <- which(abs(lhs-rhs)==d)
+  k[sdd]
+}
+
+kfit(freq)
+
+
+nb <- 238*(1+1.0042/0.582)^(-0.582)*factorial(.582+(0:12)-1)/
+  (factorial(0:12)*factorial(0.582-1))*(1.0042/(1.0042+0.582))^(0:12)
+
+
+both <- numeric(26)
+both[1:26 %% 2 != 0] <- freq
+both[1:26 %% 2 == 0] <- nb
+labs <- as.character(rep(0:12,each=2))
+labs[1:26%%2==0] <- ""
+
+barplot(both,col=rep(c(3,4),13),ylab="frequency",names=labs,cex.names=0.8)
+legend(locator(1),c("observed","expected"),fill=c(3,4))
+
+sum(((freq-nb)^2/nb)[nb > 5])
+sum(nb>5)
+
+qchisq(0.95,2)
+```
+
+
+
+
+# Section 7.5
+```{r}
+
+a <- matrix(c(1,0,4,2,-1,1),nrow=3)
+a
+
+b <- matrix(c(1,-1,2,1,1,0),nrow=2)
+b
+```
+
+# Section 7.5.1
+```{r}
+a[1,]
+b[,1]
+a[1,]*b[,1]
+
+sum(a[1,]*b[,1])
+a[1,]
+b[,2]
+a[1,]*b[,2]
+sum(a[1,]*b[,2])
+
+a[1,]*b[,3]
+sum(a[1,]*b[,3])
+
+a %*% b
+b %*% a
+
+```
+# Section 7.5.2
+```{r}
+(ym <- diag(1,3,3))
+diag(ym) <- 1:3
+ym
+
+diag(ym)
+M <- cbind(X=1:5, Y=rnorm(5))
+var(M)
+
+diag(var(M))
+
+```
+# Section 7.5.3
+```{r}
+A <- matrix(c(1,2,4,2,1,1,3,1,2),nrow=3)
+A
+
+det(A)
+B <- A
+B[3,] <- 3*B[3,]
+B
+det(B)
+
+C <- A
+C[,2] <- 0
+C
+det(C)
+
+```
+# Section 7.5.4
+```{r}
+
+library(MASS)
+ginv(A)
+ginv(ginv(A))
+
+1/det(ginv(A))
+
+```
+# Section 7.5.5
+```{r}
+
+L <- c(0,0.7,0,0,6,0,0.5,0,3,0,0,0.3,1,0,0,0)
+L <- matrix(L,nrow=4)
+L
+
+
+n <- c(45,20,17,3)
+n <- matrix(n,ncol=1)
+n
+
+
+L %*% n
+45*0+20*6+17*3+3*1
+fun <- function(x) L %*% x
+n <- c(45,20,17,3)
+n <- matrix(n,ncol=1)
+structure <- numeric(160)
+dim(structure) <- c(40,4)
+for (i in 1:40) {
+  n <- fun(n)
+  structure[i,] <- n
+}
+matplot(1:40,log(structure),type="l")
+
+
+sum(structure[40,])/sum(structure[39,])
+structure[40,]/sum(structure[40,])
+eigen(L)
+eigen(L)$vectors[,1]/sum(eigen(L)$vectors[,1])
+
+```
+# Section 7.5.6
+```{r}
+numbers <- read.table("tannin.txt",header=T)
+attach(numbers)
+names(numbers)
+
+growth
+sum(growth)
+growth^2
+sum(growth^2)
+
+tannin
+sum(tannin)
+tannin^2
+sum(tannin^2)
+growth*tannin
+
+
+sum(growth*tannin)
+growth %*% tannin
+growth %*% growth
+
+growth %*% t(growth)
+
+tannin %*% tannin
+growth %*% rep(1,9)
+tannin %*% rep(1,9)
+
+rep(1,9 )%*% rep(1,9)
+a <- cbind(growth,tannin)
+a
+
+t(a) %*% a
+b <- cbind(1,growth,tannin)
+b
+dimnames(b)[[2]] [1] <- "sample"
+
+t(b) %*% b
+
+```
+# Section 7.5.7
+```{r}
+Y <- growth
+one <- rep(1,9)
+
+t(one) %*% one
+X <- cbind(1,tannin)
+X
+
+t(Y) %*% Y
+t(one) %*% Y
+
+t(Y) %*% one %*% t(one) %*% Y
+t(X) %*% X
+t(X) %*% Y
+
+library(MASS)
+ginv(t(X) %*% X)
+
+ginv(t(X) %*% X) %*% t(X) %*% Y
+
+CF <- t(Y) %*% one %*% t(one) %*% Y/9
+CF
+t(Y) %*% Y - CF
+
+b <- ginv(t(X) %*% X) %*% t(X) %*% Y
+t(b) %*% t(X) %*% Y - CF
+
+t(Y) %*% Y - t(b) %*% t(X) %*% Y
+
+```
+
+
+# Section 7.6
+```{r}
+A <- matrix(c(3,1,4,2),nrow=2)
+A
+kv <- matrix(c(12,8),nrow=2)
+kv
+solve(A,kv)
+
+
+```
+
+# Section 7.7
+# Section 7.7.1
+```{r}
+D(expression(2*x^3),"x")
+D(expression(log(x)),"x")
+D(expression(a*exp(-b * x)),"x")
+
+D(expression(a/(1+b*exp(-c * x))),"x")
+
+trig.exp <- expression(sin(cos(x + y^2)))
+D(trig.exp, "x")
+-(cos(cos(x + y^2)) * sin(x + y^2))
+
+```
+# Section 7.7.2
+```{r}
+integrate(dnorm,0,Inf)
+integrate(dnorm,-Inf,Inf)
+integrate(function(x) rep(2, length(x)), 0, 1)
+
+integrand <- function(x) {1/((x+1)*sqrt(x))}
+integrate(integrand, lower = 0, upper = Inf)
+
+xv <- seq(0,10,0.1)
+plot(xv,integrand(xv),type="l")
+
+```
+# Section 7.7.3
+```{r}
+install.packages("deSolve")
+library(deSolve)
+
+phmodel <- function(t,state,parameters){
+  with(as.list(c(state,parameters)),{
+    dv <- r*v*(K-v)/K-b*v*n
+    dn <- c*v*n-d*n
+    result <- c(dv,dn)
+    list(result)
+  })}
+
+times <- seq(0,500,length=501)
+parameters <- c(r=0.4,K=1000,b=0.02,c=0.01,d=0.3)
+initial <- c(v=50,n=10)
+output <- ode(y=initial,time=times,func=phmodel,parms=parameters)
+head(output)
+
+plot(output[,1],output[,2],
+     ylim=c(0,60),type="n",ylab="abundance",xlab="time")
+lines(output[,1],output[,2],col="green")
+lines(output[,1],output[,3],col="red")
+
+plot(output[,3],output[,2],
+     ylim=c(0,70),xlim=c(0,70),type="n",ylab="plant",xlab="herbivore")
+lines(output[,2],output[,3],col="red")
+```
+
+
+

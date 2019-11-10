@@ -1,0 +1,297 @@
+---
+title: "Nathan Wemmer"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+# Chapter 6
+
+# Section 6.1 
+You told us to skip this one, since the data file was not included.
+# Section 6.2
+```{r}
+data<-read.table("Daphnia.txt",header=T)
+
+
+attach(data)
+names(data)
+
+tapply(Growth.rate,Detergent,mean)
+tapply(Growth.rate,Water,mean)
+
+tapply(Growth.rate,Daphnia,mean)
+tapply(Growth.rate,list(Daphnia,Detergent),mean)
+tapply(Growth.rate,list(Daphnia,Detergent),median)
+
+tapply(Growth.rate,list(Daphnia,Detergent), function(x) sqrt(var(x)/length(x)))
+tapply(Growth.rate,list(Daphnia,Detergent,Water),mean)
+ftable(tapply(Growth.rate,list(Daphnia,Detergent,Water),mean))
+
+water<-factor(Water,levels=c("Wear","Tyne"))
+ftable(tapply(Growth.rate,list(Daphnia,Detergent,water),mean))
+
+tapply(Growth.rate,Detergent,mean,trim=0.1)
+tapply(Growth.rate,Detergent,mean,na.rm=T)
+
+dets <- as.vector(tapply(as.numeric(Detergent),list(Detergent,Daphnia),mean))
+levels(Detergent)[dets]
+clones<-as.vector(tapply(as.numeric(Daphnia),list(Detergent,Daphnia),mean))
+levels(Daphnia)[clones]
+tapply(Growth.rate,list(Detergent,Daphnia),mean)
+
+means <- as.vector(tapply(Growth.rate,list(Detergent,Daphnia),mean))
+detergent <- levels(Detergent)[dets]
+daphnia <- levels(Daphnia)[clones]
+data.frame(means,detergent,daphnia)
+
+as.data.frame.table(tapply(Growth.rate,list(Detergent,Daphnia),mean))
+
+new<-as.data.frame.table(tapply(Growth.rate,list(Detergent,Daphnia),mean))
+names(new)<-c("detergents","daphina","means")
+head(new)
+
+
+
+
+```
+
+# Section 6.3
+```{r}
+count.table<-read.table("tabledata.txt",header=T)
+attach(count.table)
+head(count.table)
+
+
+lapply(count.table,function(x)rep(x, count.table$count))
+dbtable<-as.data.frame(lapply(count.table,function(x)rep(x, count.table$count)))
+head(dbtable)
+
+dbtable<-dbtable[,-1]
+head(dbtable)
+
+tail(dbtable)
+
+```
+# Section 6.4
+```{r}
+table(dbtable)
+
+as.data.frame(table(dbtable))
+
+frame<-as.data.frame(table(dbtable))
+names(frame)[4]<-"count"
+frame
+
+```
+# Section 6.5
+```{r}
+counts<-matrix(c(2,2,4,3,1,4,2,0,1,5,3,3),nrow=4)
+counts
+
+prop.table(counts,1)
+prop.table(counts,2)
+colSums(prop.table(counts,2))
+prop.table(counts)
+sum(prop.table(counts))
+```
+
+# Section 6.6
+```{r}
+scale(counts)
+apply(counts,2,sd)
+```
+# Section 6.7
+```{r}
+expand.grid(height = seq(60, 80, 5), weight = seq(100, 300, 50), sex = c("Male","Female"))
+
+```
+
+# Section 6.8
+```{r}
+data<-read.table("parasites.txt")
+names(data)<-"parasite"
+attach(data)
+head(data)
+
+levels(parasite)
+vulgaris<-factor(1*(parasite=="vulgaris"))
+kochii<-factor(1*(parasite=="kochii"))
+table(vulgaris)
+
+table(kochii)
+model.matrix(~parasite-1)
+
+
+# not work! where is original.frame?
+new.frame<-data.frame(original.frame, model.matrix(~parasite-1))
+attach(new.frame)
+```
+# Section 6.9
+```{r}
+table(c(2,2,2,7,7,11))
+
+tabulate(c(2,2,2,7,7,11))
+
+tabulate(c(2,0,-3,2,2,7,-1, 0,0,7,11))
+
+table(rnbinom(100,1,0.2))
+table(rnbinom(100,1,0.2))
+table(rnbinom(100,1,0.2))
+tabulate(rnbinom(100,1,0.2)+1,30)
+totals<-numeric(1000)
+for (i in 1:1000) totals[i] <- sum(tabulate(rnbinom(100,1,0.2)+1,30))
+table(totals)
+
+
+
+```
+
+# Chapter 7
+# Section 7.1.1
+```{r}
+
+x <- seq(0,10,0.1)
+
+windows(7,4)
+par(mfrow=c(1,2))
+y <- exp(x)
+plot(y~x,type="l",main="Exponential")
+y <- log(x)
+plot(y~x,type="l",main="Logarithmic")
+
+
+```
+# Section 7.1.2
+```{r}
+windows(7,7)
+par(mfrow=c(2,2))
+x <- seq(0,2*pi,2*pi/100)
+y1 <- cos(x)
+y2 <- sin(x)
+y3 <- tan(x)
+plot(y1~x,type="l",main="cosine")
+plot(y2~x,type="l",main="sine")
+plot(y3~x,type="l",ylim=c(-3,3),main="tangent")
+```
+# Section 7.1.3
+```{r}
+x <- seq(0,1,0.01)
+y <- x^0.5
+plot(x,y,type="l",main="0<b<1")
+y <- x
+plot(x,y,type="l",main="b=1")
+y <- x^2
+plot(x,y,type="l",main="b>1")
+y <- 1/x
+plot(x,y,type="l",main="b<0")
+```
+
+# Section 7.1.4
+```{r}
+x <- seq(0,10,0.1)
+y1 <- 2+5*x-0.2*x^2
+y2 <- 2+5*x-0.4*x^2
+y3 <- 2+4*x-0.6*x^2+0.04*x^3
+y4 <- 2+4*x+2*x^2-0.6*x^3+0.04*x^4
+par(mfrow=c(2,2))
+plot(x,y1,type="l",ylab="y",main="decelerating")
+plot(x,y2,type="l",ylab="y",main="humped")
+plot(x,y3,type="l",ylab="y",main="inflection")
+plot(x,y4,type="l",ylab="y",main="local maximum")
+
+par(mfrow=c(2,2))
+y1 <- x/(2+5*x)
+y2 <- 1/(x-2+4/x)
+y3 <- 1/(x^2-2+4/x)
+plot(x,y1,type="l",ylab="y",main="Michaelis-Menten")
+plot(x,y2,type="l",ylab="y",main="shallow hump")
+plot(x,y3,type="l",ylab="y",main="steep hump")
+```
+
+# Section 7.1.5
+```{r}
+par(mfrow=c(1,1))
+t <- seq(0.2,4,0.01)
+plot(t,gamma(t),type="l")
+abline(h=1,lty=2)
+```
+
+# Section 7.1.6
+# Section 7.1.7
+```{r}
+(1/44.44 - 1/70.59)/(1/0.2 - 1/0.6)
+```
+
+# section 7.1.8
+```{r}
+par(mfrow=c(2,2))
+x <- seq(0,10,0.1)
+y <- 100/(1+90*exp(-1*x))
+plot(x,y,type="l",main="three-parameter logistic")
+y <- 20+100/(1+exp(0.8*(3-x)))
+plot(x,y,ylim=c(0,140),type="l",main="four-parameter logistic")
+x <- -200:100
+y <- 100*exp(-exp(0.02*x))
+plot(x,y,type="l",main="negative Gompertz")
+x <- 0:100
+y <- 50*exp(-5*exp(-0.08*x))
+plot(x,y,type="l",main="positive Gompertz")
+```
+# Section 7.1.9
+```{r}
+#1
+a <- 10
+b <- -0.8
+c <- 10
+d <- -0.05
+y <- a*exp(b*x)+c*exp(d*x)
+plot(x,y,main="+ - + -",type="l")
+```
+# 2
+```{r}
+
+a <- 10
+b <- -0.8
+c <- 10
+d <- 0.05
+y <- a*exp(b*x)+c*exp(d*x)
+plot(x,y,main="+ - + +",type="l")
+```
+# 3
+```{r}
+a <- 200
+b <- 0.2
+c <- -1
+d <- 0.7
+y <- a*exp(b*x)+c*exp(d*x)
+plot(x,y,main="+ + - +",type="l")
+```
+#4
+```{r}
+a <- 200
+b <- 0.05
+c <- 300
+d <- -0.5
+y <- a*exp(b*x)+c*exp(d*x)
+plot(x,y,main="+ + + -",type="l")
+
+```
+
+# Section 7.2
+```{r}
+par(mfrow=c(1,1))
+x <- 0:6
+plot(x,factorial(x),type="s",main="factorial x",log="y")
+choose(8,3)
+
+plot(0:8,choose(8,0:8),type="s",main="binomial coefficients")
+```
+
